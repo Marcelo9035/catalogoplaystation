@@ -72,6 +72,7 @@
         }
 
         /* Custom Line Clamp to avoid Tailwind conflicts */
+        /* IMPORTANT: This class is applied to the synopsis in the grid view (if needed) but removed in the modal view for full readability. */
         .synopsis-clamp {
             display: -webkit-box !important;
             -webkit-line-clamp: 3;
@@ -92,7 +93,7 @@
         <div class="max-w-md w-full bg-slate-900 rounded-xl shadow-2xl border border-slate-800 p-8 space-y-6 animate-zoom-in">
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-blue-600 rounded-lg mx-auto flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)] mb-4 transition-all duration-300 hover:shadow-[0_0_30px_rgba(37,99,235,1)] hover:brightness-125 hover:scale-105 cursor-pointer">
-                     <img 
+                    <img 
                         src="https://raw.githubusercontent.com/Marcelo9035/IMAGES/refs/heads/main/pngwing.com.png" 
                         alt="Logo" 
                         class="w-10 h-10 object-contain filter drop-shadow-md"
@@ -187,10 +188,10 @@
         
         <!-- Header -->
         <header class="bg-gradient-to-r from-slate-950 to-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl">
-            <div class="container mx-auto px-4 py-6 flex flex-col lg:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3 w-full lg:w-auto justify-center lg:justify-start">
-                    <!-- PlayStation Logo Container -->
-                    <div class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)] overflow-hidden shrink-0 transition-all duration-300 hover:shadow-[0_0_30px_rgba(37,99,235,1)] hover:brightness-125 hover:scale-105 cursor-pointer">
+            <div class="container mx-auto px-4 py-6 flex flex-col lg:flex-row items-center justify-between gap-4 relative">
+                <div class="flex items-center gap-3 w-full lg:w-auto justify-center lg:justify-start relative z-50">
+                    <!-- PlayStation Logo Container (TRIGGER) -->
+                    <div onclick="toggleHeaderButtons()" id="header-logo-trigger" class="w-10 h-10 bg-blue-600 rounded flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)] overflow-hidden shrink-0 transition-all duration-300 hover:shadow-[0_0_30px_rgba(37,99,235,1)] hover:brightness-125 hover:scale-105 cursor-pointer" title="Clique para Menu de Opções">
                         <img 
                             src="https://raw.githubusercontent.com/Marcelo9035/IMAGES/refs/heads/main/pngwing.com.png" 
                             alt="PlayStation Logo" 
@@ -201,9 +202,74 @@
                     <h1 class="text-xl md:text-2xl lg:text-3xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 uppercase cursor-pointer whitespace-nowrap" onclick="resetFilter()">
                         MEU CATÁLOGO DE JOGOS
                     </h1>
+
+                    <!-- DROPDOWN MENU (Hidden by default) -->
+                    <div id="header-buttons" class="hidden absolute top-14 left-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-4 flex flex-col gap-3 animate-zoom-in z-[100]">
+                        
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 border-b border-slate-700 pb-2 flex justify-between items-center">
+                            <span>Menu de Ações</span>
+                            <span class="flex items-center gap-1 text-blue-400"><i data-lucide="gamepad-2" class="w-3 h-3"></i> <span id="game-count">0</span></span>
+                        </div>
+
+                        <!-- ACTION BUTTONS GROUP -->
+                        <div class="flex flex-col gap-2">
+                            <!-- ADD GAME Button -->
+                            <button onclick="openAddGameModal(); closeHeaderButtons();" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg transition-all shadow-lg active:scale-95 w-full justify-start" title="Adicionar Novo Jogo">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                <span class="font-semibold">Novo Jogo</span>
+                            </button>
+
+                            <!-- EDIT MODE Button -->
+                            <button id="btn-edit-mode" onclick="toggleEditMode(); closeHeaderButtons();" class="flex items-center gap-3 bg-slate-700 hover:bg-amber-600 text-slate-300 hover:text-white px-3 py-2 rounded-lg transition-all active:scale-95 w-full justify-start" title="Modo de Edição">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                                <span class="font-semibold">Alterar Jogos</span>
+                            </button>
+
+                            <!-- DELETE MODE Button -->
+                            <button id="btn-delete-mode" onclick="toggleDeleteMode(); closeHeaderButtons();" class="flex items-center gap-3 bg-slate-700 hover:bg-red-600 text-slate-300 hover:text-white px-3 py-2 rounded-lg transition-all active:scale-95 w-full justify-start" title="Modo de Exclusão">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                <span class="font-semibold">Excluir Jogos</span>
+                            </button>
+                        </div>
+
+                        <div class="h-px bg-slate-700 my-1"></div>
+
+                        <!-- SAVE Button -->
+                        <button id="save-btn" onclick="handleManualSave(); closeHeaderButtons();" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all shadow-lg transform active:scale-95 bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500 w-full justify-start" title="Salvar manualmente">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span class="font-semibold">Salvar Dados</span>
+                        </button>
+
+                        <!-- Backup Button -->
+                        <button onclick="downloadBackup(); closeHeaderButtons();" class="flex items-center gap-3 bg-sky-600/90 hover:bg-sky-500 text-white px-3 py-2 rounded-lg transition-colors shadow-lg shadow-sky-900/20 w-full justify-start" title="Baixar Backup HTML Completo">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span class="font-semibold">Backup HTML</span>
+                        </button>
+
+                        <!-- Restore Button -->
+                        <button onclick="document.getElementById('restore-input').click(); closeHeaderButtons();" class="flex items-center gap-3 bg-violet-600/90 hover:bg-violet-500 text-white px-3 py-2 rounded-lg transition-colors shadow-lg shadow-violet-900/20 w-full justify-start" title="Restaurar de Arquivo HTML">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
+                            <span class="font-semibold">Restaurar</span>
+                        </button>
+                        <input type="file" id="restore-input" accept=".html" class="hidden" onchange="handleRestore(this)">
+
+                        <!-- Export Button -->
+                        <button onclick="exportToExcel(); closeHeaderButtons();" class="flex items-center gap-3 bg-emerald-600/90 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors shadow-lg shadow-emerald-900/20 w-full justify-start" title="Baixar Excel com Gráficos">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                            <span class="font-semibold">Exportar Excel</span>
+                        </button>
+
+                        <div class="h-px bg-slate-700 my-1"></div>
+
+                        <!-- Logout Button -->
+                        <button onclick="handleLogout(); closeHeaderButtons();" class="flex items-center gap-3 bg-red-600/10 hover:bg-red-600/30 text-red-400 hover:text-red-200 px-3 py-2 rounded-lg transition-colors w-full justify-start" title="Sair">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <span class="font-semibold">Sair</span>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
+                <div class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto relative z-40">
                     
                     <!-- Search Bar -->
                     <div class="relative group w-full md:w-64">
@@ -230,34 +296,17 @@
                             <i data-lucide="filter" class="w-4 h-4"></i>
                         </div>
                     </div>
-
-                    <div class="hidden lg:flex items-center gap-2 text-sm text-slate-400 ml-2 whitespace-nowrap">
-                        <span class="w-px h-6 bg-slate-700 mx-1"></span>
-                        <span class="flex items-center gap-1 mr-2"><i data-lucide="gamepad-2" class="w-4 h-4"></i> <span id="game-count">0</span></span>
-                        
-                        <!-- SAVE Button -->
-                        <button id="save-btn" onclick="handleManualSave()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all shadow-lg transform active:scale-95 bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500" title="Salvar manualmente">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span class="hidden xl:inline font-semibold">SALVAR</span>
-                        </button>
-
-                        <!-- Export Button -->
-                        <button onclick="exportToExcel()" class="flex items-center gap-2 bg-emerald-600/90 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg transition-colors shadow-lg shadow-emerald-900/20" title="Baixar Excel com Gráficos">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-                            <span class="hidden xl:inline font-semibold">Excel</span>
-                        </button>
-
-                        <!-- Logout Button -->
-                        <button onclick="handleLogout()" class="bg-red-600/10 hover:bg-red-600/30 text-red-400 hover:text-red-200 p-1.5 rounded-lg transition-colors ml-1" title="Sair">
-                            <i data-lucide="log-out" class="w-4 h-4"></i>
-                        </button>
-                    </div>
                 </div>
+            </div>
+            
+            <!-- Mode Indicator Banner -->
+            <div id="mode-indicator" class="hidden w-full text-center py-2 text-sm font-bold uppercase tracking-wider text-white transition-colors relative z-30">
+                <!-- Injected via JS -->
             </div>
         </header>
 
         <!-- Main Content Area -->
-        <main class="container mx-auto px-4 py-8">
+        <main class="container mx-auto px-4 py-8 relative z-0">
             
             <!-- HIGHLIGHT SECTION: JOGANDO ATUALMENTE -->
             <div id="playing-section" class="hidden mb-10 animate-fade-in">
@@ -274,7 +323,7 @@
             </div>
         </main>
 
-        <!-- Modal Backdrop -->
+        <!-- Game Details Modal Backdrop -->
         <div id="modal-backdrop" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden animate-fade-in">
             <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
             
@@ -289,6 +338,120 @@
             <!-- Modal Content Container -->
             <div id="modal-content" class="bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-xl border border-slate-700 shadow-2xl flex flex-col md:flex-row relative z-50 animate-zoom-in overflow-hidden">
                 <!-- Dynamic Content Injected Here -->
+            </div>
+        </div>
+
+        <!-- ADD/EDIT GAME MODAL -->
+        <div id="add-game-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden animate-fade-in">
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeAddGameModal()"></div>
+            
+            <div class="bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-xl border border-slate-700 shadow-2xl flex flex-col md:flex-row relative z-[70] animate-zoom-in overflow-hidden">
+                <button onclick="closeAddGameModal()" class="absolute top-4 right-4 z-50 bg-black/50 p-2 rounded-full text-white hover:bg-black/70 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Left Side: Cover Preview -->
+                <div class="w-full md:w-1/3 bg-slate-950 p-6 flex flex-col items-center justify-center border-r border-slate-800">
+                    <h3 class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-4">Pré-visualização da Capa</h3>
+                    <div class="relative w-full max-w-[200px] aspect-[3/4] bg-slate-800 rounded-lg overflow-hidden shadow-lg border border-slate-700 flex items-center justify-center group">
+                        <img id="new-game-preview" src="" alt="Capa" class="w-full h-full object-cover hidden" />
+                        <div id="new-game-placeholder" class="text-slate-600 flex flex-col items-center text-center p-4">
+                            <i data-lucide="image" class="w-12 h-12 mb-2"></i>
+                            <span class="text-xs">A imagem aparecerá aqui quando inserir a URL</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-4 text-center">Recomendado: Imagens verticais (Proporção 3:4)</p>
+                </div>
+
+                <!-- Right Side: Form -->
+                <div class="flex-1 flex flex-col min-h-0 bg-slate-900">
+                    <div class="p-6 border-b border-slate-800 bg-slate-900/95 sticky top-0 z-10">
+                        <h2 id="modal-form-title" class="text-2xl font-bold text-white flex items-center gap-2">
+                            <!-- JS will set title -->
+                        </h2>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                        <input type="hidden" id="edit-game-id" value="">
+                        
+                        <!-- Basic Info -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-1">Título do Jogo</label>
+                                <!-- Added 'uppercase' class to input -->
+                                <input type="text" id="new-title" onkeydown="if(event.key === 'Enter') handleSaveGame()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase" placeholder="EX: GOD OF WAR">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-1">URL da Capa (Imagem)</label>
+                                <input type="text" id="new-cover" oninput="updatePreview(this.value)" onkeydown="if(event.key === 'Enter') handleSaveGame()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://...">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-1">Sinopse</label>
+                                <textarea id="new-synopsis" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Uma breve descrição do jogo..."></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-400 mb-1">Desenvolvedora</label>
+                                    <input type="text" id="new-developer" onkeydown="if(event.key === 'Enter') handleSaveGame()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-400 mb-1">Publicadora</label>
+                                    <input type="text" id="new-publisher" onkeydown="if(event.key === 'Enter') handleSaveGame()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-400 mb-1">Data de Lançamento</label>
+                                    <input type="text" id="new-date" onkeydown="if(event.key === 'Enter') handleSaveGame()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="DD/MM/AAAA">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-400 mb-1">Classificação Indicativa</label>
+                                    <select id="new-age" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                        <option value="Livre">Livre</option>
+                                        <option value="Everyone">Everyone (Livre)</option>
+                                        <option value="Everyone 10+">Everyone 10+</option>
+                                        <option value="Teen">Teen (13+)</option>
+                                        <option value="Mature">Mature (17+)</option>
+                                        <option value="18+">18+</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Selectors -->
+                        <div>
+                            <label class="block text-sm font-medium text-blue-400 mb-2 uppercase tracking-wider">Plataformas</label>
+                            <div id="new-platforms-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                <!-- JS will inject buttons here -->
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-blue-400 mb-2 uppercase tracking-wider">Áudio / Legendas</label>
+                            <div id="new-audio-container" class="flex flex-wrap gap-2">
+                                <!-- JS will inject buttons here -->
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-blue-400 mb-2 uppercase tracking-wider">Tipo de Mídia</label>
+                            <div id="new-media-container" class="flex flex-wrap gap-2">
+                                <!-- JS will inject buttons here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-slate-800 bg-slate-900/95 flex justify-end gap-3">
+                        <button onclick="closeAddGameModal()" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">Cancelar</button>
+                        <button onclick="handleSaveGame()" id="modal-save-btn" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-900/20 transition-transform active:scale-95 flex items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4"></i> Salvar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -383,87 +546,87 @@
 
         // --- INITIAL DATA (Fallback) ---
         const initialGamesData = [
-            { id: 5, title: "Altered Beast", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/4007-1.jpg", synopsis: "Luke Custer, um agente da Genome Cyber Force, descobre que pode se transformar em bestas monstruosas como lobisomem e dragão. Ele luta contra horrores biotecnológicos para recuperar sua memória e impedir uma ameaça global. O jogo mistura ação, mutações grotescas e clima de terror biotecnológico.", developer: "SEGA Wow", publisher: "SEGA", date: "27/01/2005", age: "Mature", platforms: ["PlayStation 2"], languageOption: "Sem Legenda", mediaType: "Físico" },
-            { id: 47, title: "Assassin’s Creed Odyssey", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/102951-1.jpg", synopsis: "Escreva sua própria odisseia épica e torne-se um lendário herói espartano. Molde seu destino em um mundo onde cada escolha importa. Testemunhe a grandeza da Grécia Antiga em meio à guerra.", developer: "Ubisoft Quebec", publisher: "Ubisoft", date: "05/10/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"] },
-            { id: 67, title: "Assassin’s Creed Origins", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/50681-1.jpg", synopsis: "Viaje para o Antigo Egito, o lugar mais misterioso da história, durante um período crucial que moldará o mundo. Descubra os segredos por trás das Grandes Pirâmides, mitos esquecidos e a origem da Irmandade dos Assassinos.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "27/10/2017", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 46, title: "Assassin’s Creed Valhalla", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/72400-1.jpg", synopsis: "Torne-se Eivor, um lendário invasor viking em busca de glória. Explore a Idade das Trevas da Inglaterra, ataque seus inimigos, amplie seu assentamento e construa seu poder político.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "10/11/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"] },
-            { id: 34, title: "Batman: Arkham City", cover: "https://images.launchbox-app.com//cc3528af-a8f8-40ff-92c3-59e164454e4f.jpg", synopsis: "Batman explora Arkham City, uma enorme prisão a céu aberto onde os criminosos de Gotham foram confinados. O jogo combina combate fluido, gadgets avançados e uma narrativa sombria envolvendo o Coringa, Hugo Strange e outros vilões icônicos.", developer: "Rocksteady Studios", publisher: "Warner Bros. Interactive", date: "18/10/2011", age: "Teen", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "Wii U"] },
-            { id: 29, title: "Beat Down: Fists of Vengeance", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/27852-1.jpg", synopsis: "Traídos pela máfia, cinco lutadores buscam vingança. Briga de rua brutal, recrutamento de capangas e negociações no submundo. O jogador assume o papel de um dos cinco protagonistas, cada um com habilidades únicas.", developer: "Cavia Inc.", publisher: "Capcom", date: "27/10/2005", age: "Mature 17+", platforms: ["PlayStation 2"] },
-            { id: 44, title: "Beyond: Two Souls", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/15320-1.jpg", synopsis: "Jodie Holmes possui uma ligação com uma entidade sobrenatural chamada Aiden. O jogador vive 15 anos da vida de Jodie, tomando decisões que moldam seu destino nesta aventura narrativa interativa.", developer: "Quantic Dream", publisher: "Sony Computer Entertainment", date: "08/10/2013", age: "Mature", platforms: ["PlayStation 3", "PlayStation 4", "Microsoft Windows"] },
-            { id: 28, title: "Black", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/3942-1.jpg", synopsis: "O 'Pornografia de Armas'. Um FPS focado em destruição total de cenários e som ensurdecedor de tiroteios. Ação pura sem mecânicas de stealth. O jogo foca em combates realistas e destruição ambiental.", developer: "Criterion Games", publisher: "Electronic Arts", date: "15/02/2006", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox"] },
-            { id: 6, title: "Bloody Roar 4", cover: "https://images.launchbox-app.com//e69d8017-41cd-4b1c-a7e9-45799a7158f1.jpg", synopsis: "A força 'Unborn' desperta, ameaçando humanos e Zoanthropes. Lutadores clássicos e novos personagens se enfrentam em combates onde podem se transformar em feras violentas no meio da luta. Bloody Roar 4 entrega uma trama mais sombria, com foco em possessão, sacrifício e poder incontrolável.", developer: "Eighting / Raizing", publisher: "Hudson Soft / Konami", date: "11/12/2003", age: "Teen", platforms: ["PlayStation 2"] },
-            { id: 17, title: "Bully", cover: "https://gamesdb-images.launchbox.gg/r2_8a7302f4-361d-4a0a-a484-4c686797af4c.jpg", synopsis: "Jimmy Hopkins navega pela hierarquia social da Bullworth Academy. Enfrente valentões, assista aulas e pregue peças neste mundo aberto escolar satírico. O jogador deve cumprir missões que variam de trapaças e brigas até entregas e corridas de bicicletas.", developer: "Rockstar Vancouver", publisher: "Rockstar Games", date: "17/10/2006", age: "Teen", platforms: ["PlayStation 2", "Xbox 360", "Wii", "Microsoft Windows"] },
-            { id: 37, title: "Call of Duty: Black Ops II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/9936-1.jpg", synopsis: "FPS que transita entre os anos 1980 e 2025. Acompanhe Alex e David Mason enfrentando o terrorista Raul Menendez. O jogo introduz narrativa ramificada, armas futuristas e um robusto modo multiplayer e Zombies.", developer: "Treyarch", publisher: "Activision", date: "13/11/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "Wii U"] },
-            { id: 71, title: "Call of Duty: Infinite Warfare", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/36616-1.jpg", synopsis: "A guerra se expande para o sistema solar. Como Capitão Reyes, lidere as forças remanescentes da coalizão contra um inimigo implacável. Combate em gravidade zero, batalhas espaciais e uma narrativa cinematográfica.", developer: "Infinity Ward", publisher: "Activision", date: "04/11/2016", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 39, title: "Call of Duty: Modern Warfare 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/8303-1.jpg", synopsis: "Conclusão da trilogia Modern Warfare. Price e Soap perseguem Makarov em uma guerra global que se espalha por Nova York, Londres e Paris. Ação cinematográfica intensa e multiplayer competitivo refinado.", developer: "Infinity Ward / Sledgehammer", publisher: "Activision", date: "08/11/2011", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "Wii"] },
-            { id: 49, title: "Cyberpunk 2077", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/77520-1.jpg", synopsis: "Uma história de ação e aventura de mundo aberto ambientada em Night City, uma megalópole obcecada por poder, glamour e modificações corporais. Você joga como V, um mercenário fora da lei atrás de um implante único.", developer: "CD Projekt Red", publisher: "CD Projekt", date: "10/12/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"] },
-            { id: 57, title: "Days Gone", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/38442-1.jpg", synopsis: "Pilote e lute em uma América mortal pós-pandemia. Deacon St. John, um errante e caçador de recompensas, busca uma razão para viver enquanto enfrenta gangues humanas e hordas aterrorizantes de Freakers.", developer: "Bend Studio", publisher: "Sony Interactive Entertainment", date: "26/04/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"] },
-            { id: 59, title: "Dead Rising 4: Frank's Big Package", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/51662-1.jpg", synopsis: "Frank West retorna a Willamette para investigar um novo surto zumbi durante o Natal. Use um arsenal insano de armas combo e veículos para dizimar hordas em um mundo aberto caótico e divertido.", developer: "Capcom Vancouver", publisher: "Capcom", date: "06/12/2017", age: "Mature", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"] },
-            { id: 54, title: "Death Stranding", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/38113-1.jpg", synopsis: "Sam Bridges deve enfrentar um mundo transformado pelo Death Stranding. Carregando os restos desconectados de nosso futuro, ele embarca em uma jornada para reconectar o mundo despedaçado, um passo de cada vez.", developer: "Kojima Productions", publisher: "Sony Interactive Entertainment", date: "08/11/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"] },
-            { id: 11, title: "Def Jam: Fight for NY", cover: "https://images.launchbox-app.com//093aedcd-bc6c-4670-86dc-85a81f56af83.jpg", synopsis: "Lute pelo controle do submundo de NY. Com a ajuda de D-Mob, enfrente a gangue de Crow (Snoop Dogg) usando estilos de luta variados e interagindo com lendas do Hip-Hop. As batalhas acontecem em cenários explosivos, como becos estreitos, metrôs em movimento e garagens em chamas.", developer: "EA Canada / AKI Corp", publisher: "Electronic Arts", date: "20/09/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube"] },
-            { id: 53, title: "Detroit: Become Human", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/48142-1.jpg", synopsis: "Em um futuro onde androides ganham consciência, o destino da humanidade e das máquinas está em suas mãos. Cada escolha molda uma narrativa ramificada intensa através dos olhos de três protagonistas androides.", developer: "Quantic Dream", publisher: "Sony Interactive Entertainment", date: "25/05/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"] },
-            { id: 20, title: "Devil May Cry 3: Dante's Awakening", cover: "https://images.launchbox-app.com//f5e3b801-379a-4cb0-926b-69a5031717fd.jpg", synopsis: "Prequel que mostra o jovem Dante enfrentando seu irmão Vergil. Introduz o sistema de Estilos de Combate e define a personalidade irreverente do protagonista. O jogador acompanha Dante em sua jornada para enfrentar criaturas demoníacas e impedir que Vergil obtenha o poder de Sparda.", developer: "Capcom", publisher: "Capcom", date: "01/03/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Microsoft Windows", "PlayStation 3", "Xbox 360"] },
-            { id: 16, title: "DRIV3R", cover: "https://images.launchbox-app.com//8ba9e7c6-5d7f-4207-9458-cdb572637d71.jpg", synopsis: "Tanner, um policial infiltrado, caça uma quadrilha de roubo de carros internacional em Nice, Miami e Istambul. Ação cinematográfica dentro e fora dos veículos. O jogo combina corridas de alta velocidade, perseguições intensas e missões de infiltração.", developer: "Reflections Interactive", publisher: "Atari", date: "21/06/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Microsoft Windows", "GameCube"] },
-            { id: 63, title: "Dying Light: Enhanced Edition", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/34954-1.jpg", synopsis: "Sobreviva em uma cidade devastada por um vírus zumbi. Durante o dia, explore e colete recursos com parkour. À noite, os caçadores viram a caça. A edição Enhanced traz visuais melhorados e todo o conteúdo extra.", developer: "Techland", publisher: "Techland", date: "17/01/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Nintendo Switch"] },
-            { id: 55, title: "EA Sports FC 24", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/119496-1.jpg", synopsis: "A nova era do Jogo de Todo Mundo. Com mais de 19.000 jogadores licenciados, 700 times e 30 ligas, oferece autenticidade incomparável e realismo aprimorado pela tecnologia HyperMotionV.", developer: "EA Vancouver", publisher: "Electronic Arts", date: "29/09/2023", age: "Everyone", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Nintendo Switch"] },
-            { id: 14, title: "Enter the Matrix", cover: "https://images.launchbox-app.com//9e68fd38-9fa8-45b7-8629-20c06a0f8819.jpg", synopsis: "Jogue como Niobe ou Ghost em eventos paralelos a Matrix Reloaded. Combate com armas, artes marciais e direção, complementando a história dos filmes. A narrativa aprofunda a história de personagens secundários e revela segredos não mostrados nos filmes.", developer: "Shiny Entertainment", publisher: "Midway Games", date: "14/05/2003", age: "Teen", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Game Boy Advance"] },
-            { id: 33, title: "Far Cry 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/113466-1.jpg", synopsis: "Jason Brody está de férias em uma ilha tropical que se transforma em um pesadelo dominado por piratas. Ele deve aprender a sobreviver, enfrentar o insano Vaas Montenegro e resgatar seus amigos em um mundo aberto vibrante e hostil.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "29/11/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"] },
-            { id: 62, title: "Far Cry 5", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/52940-1.jpg", synopsis: "Bem-vindo a Hope County, Montana, terra dos livres e corajosos, mas também o lar de um culto apocalíptico fanático. Lidere a resistência para libertar a comunidade sitiada e acender o fogo da revolução.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "27/03/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 69, title: "FIFA 18", cover: "https://images.launchbox-app.com//ae13a2e0-69d6-4c90-b378-22d43811e38d.jpg", synopsis: "Com a tecnologia Frostbite, o FIFA 18 confunde a linha entre o mundo virtual e o real. Acompanhe a jornada de Alex Hunter e experimente a atmosfera imersiva dos estádios mais famosos do mundo.", developer: "EA Canada", publisher: "Electronic Arts", date: "29/09/2017", age: "Everyone", platforms: ["PlayStation 4", "PlayStation 3", "Xbox One", "Xbox 360", "Nintendo Switch", "Microsoft Windows"] },
-            { id: 72, title: "Ghost of Tsushima", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/88520-1.jpg", synopsis: "O jogador controla Jin Sakai, um samurai que deve proteger seu povo e sua terra natal, enfrentando tanto invasores mongóis quanto dilemas internos sobre honra e sacrifício. Para vencer, Jin adota técnicas tradicionais de samurai e estratégias furtivas, eventualmente assumindo a identidade do “Fantasma”.", developer: "Sucker Punch Productions", publisher: "Sony Interactive Entertainment", date: "17/07/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"] },
-            { id: 60, title: "God of War (2018)", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/52805-1.jpg", synopsis: "Kratos, agora vivendo como homem nas terras dos Deuses Nórdicos, deve ensinar seu filho Atreus a sobreviver. Uma reinvenção ousada da série, focada em narrativa emocional, combate estratégico e exploração.", developer: "Santa Monica Studio", publisher: "Sony Interactive Entertainment", date: "20/04/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"] },
-            { id: 1, title: "God of War II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/111300-1.jpg", synopsis: "Após derrotar Ares e assumir o trono, Kratos se torna o novo Deus da Guerra. No entanto, seus métodos brutais o colocam em conflito direto com Zeus. Traído e mortalmente ferido, Kratos é salvo pela Titã Gaia e embarca em uma jornada para mudar seu destino, buscando as Irmãs do Destino para se vingar do Olimpo. O jogo culmina com Kratos desafiando Zeus e, ao final, iniciando uma revolta que mudaria para sempre o destino do Olimpo.", developer: "Santa Monica Studio", publisher: "Sony Computer Entertainment", date: "13/03/2007", age: "Mature 17+ / 18", platforms: ["PlayStation 2", "PlayStation 3", "PlayStation Vita"] },
-            { id: 38, title: "God of War III", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/843-1.jpg", synopsis: "A conclusão épica da saga grega. Kratos escala o Monte Olimpo para se vingar de Zeus, enfrentando deuses e titãs em batalhas colossais. Conhecido por sua escala gigantesca e brutalidade visceral.", developer: "Santa Monica Studio", publisher: "Sony Computer Entertainment", date: "16/03/2010", age: "Mature", platforms: ["PlayStation 3", "PlayStation 4"] },
-            { id: 61, title: "God of War: Ragnarök", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/91197-1.jpg", synopsis: "O Fimbulwinter já começou. Kratos e Atreus devem viajar pelos Nove Reinos em busca de respostas enquanto as forças asgardianas se preparam para a batalha profetizada que causará o fim do mundo.", developer: "Santa Monica Studio", publisher: "Sony Interactive Entertainment", date: "09/11/2022", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"] },
-            { id: 41, title: "Grand Theft Auto V", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/7917-1.jpg", synopsis: "Em Los Santos, três criminosos muito diferentes — Michael, Franklin e Trevor — arriscam tudo em uma série de assaltos ousados. Um mundo aberto massivo e detalhado com sátira social afiada.", developer: "Rockstar North", publisher: "Rockstar Games", date: "17/09/2013", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 21, title: "GUN", cover: "https://images.launchbox-app.com//0fa13935-072f-4018-acce-8cc304085810.jpg", synopsis: "Colton White busca vingança no Velho Oeste. Um mundo aberto brutal com duelos, escalpes, cavalos e tiroteios intensos em uma história de fronteira. A história acompanha Colton enquanto ele descobre uma conspiração envolvendo corruptos políticos.", developer: "Neversoft", publisher: "Activision", date: "22/02/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Xbox 360", "GameCube", "Microsoft Windows"] },
-            { id: 66, title: "Injustice 2", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/45935-1.jpg", synopsis: "Construa e fortaleça a versão definitiva de suas lendas favoritas da DC. Com uma enorme seleção de super-heróis e supervilões, continue a história cinematográfica épica iniciada em Injustice: Gods Among Us.", developer: "NetherRealm Studios", publisher: "Warner Bros. Interactive", date: "16/05/2017", age: "Teen", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 4, title: "Marvel Nemesis: Rise of the Imperfects", cover: "https://images.launchbox-app.com//a4a1cd56-c559-453b-8530-39c1d6622abb.jpg", synopsis: "Uma invasão alienígena liderada pelo cruel Imperial atinge a Terra para criar supersoldados. Heróis da Marvel como Wolverine e Homem-Aranha enfrentam os 'Imperfects' em batalhas brutais em arenas destrutíveis. Com uma atmosfera sombria e combates brutais, Marvel Nemesis se destaca por colocar os heróis clássicos frente a frente com uma nova ameaça.", developer: "Nihilistic Software / EA Canada", publisher: "Electronic Arts", date: "20/09/2005", age: "Teen", platforms: ["GameCube", "PlayStation 2", "PSP", "Nintendo DS", "Xbox"] },
-            { id: 48, title: "Marvel’s Avengers", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/69109-1.jpg", synopsis: "Reúna os Heróis Mais Poderosos da Terra, abrace seus poderes e viva seus sonhos de super-herói. Uma história original dos Vingadores com modos cooperativos e combate único para cada herói.", developer: "Crystal Dynamics", publisher: "Square Enix", date: "04/09/2020", age: "Teen", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"] },
-            { id: 68, title: "Marvel’s Spider-Man", cover: "https://images.launchbox-app.com//ded2ed1f-5ef1-4752-bfce-79ccef7d7b8f.jpg", synopsis: "Jogue como um Peter Parker experiente, combatendo grandes crimes em uma Nova York da Marvel. Com combate improvisado, acrobacias dinâmicas, travessia urbana fluida e interações com o ambiente.", developer: "Insomniac Games", publisher: "Sony Interactive Entertainment", date: "07/09/2018", age: "Teen", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"] },
-            { id: 43, title: "Max Payne 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/111402-1.jpg", synopsis: "Max Payne, agora trabalhando como segurança privada em São Paulo, Brasil, enfrenta seus demônios e gangues locais para proteger uma família rica. Tiroteios estilizados com Bullet Time e narrativa sombria.", developer: "Rockstar Studios", publisher: "Rockstar Games", date: "15/05/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"] },
-            { id: 30, title: "Metal Slug", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/20017-1.jpg", synopsis: "Ação arcade clássica 'Run and Gun'. Marco, Tarma e equipe explodem tudo que se move, salvam prisioneiros e pilotam tanques Metal Slug. O jogo combina tiros frenéticos, veículos militares e ambientes destrutíveis.", developer: "SNK Playmore", publisher: "SNK", date: "14/11/2003", age: "Teen", platforms: ["PlayStation 2"] },
-            { id: 64, title: "Middle-earth: Shadow of Mordor", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/39273-1.jpg", synopsis: "Talion, um guarda de Gondor, é ressuscitado pelo espírito de Celebrimbor. Juntos, eles buscam vingança contra Sauron. O inovador Sistema Nemesis cria inimigos únicos que se lembram de cada encontro.", developer: "Monolith Productions", publisher: "Warner Bros. Interactive", date: "03/09/2014", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 65, title: "Middle-earth: Shadow of War", cover: "https://m.media-amazon.com/images/I/71iOL3viCYL._AC_SX679_.jpg", synopsis: "Vá atrás das linhas inimigas para forjar seu exército, conquistar Fortalezas e dominar Mordor de dentro para fora. Experimente como o premiado Sistema Nemesis cria histórias pessoais únicas com cada inimigo e seguidor.", developer: "Monolith Productions", publisher: "Warner Bros. Interactive", date: "10/10/2017", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 13, title: "Need for Speed: Carbon", cover: "https://images.launchbox-app.com//33f9e5ea-06b6-4dc0-9fbb-d84080372017.jpg", synopsis: "Corridas em territórios controlados por gangues e duelos mortais nos Canyons. Monte sua equipe (Crew) para conquistar a cidade e desvendar mistérios do passado. Uma grande novidade é o sistema de equipe, onde você pode recrutar aliados com habilidades especiais.", developer: "EA Black Box", publisher: "Electronic Arts", date: "02/10/2006", age: "Everyone 10+", platforms: ["PlayStation 2", "PlayStation 3", "Xbox", "Xbox 360", "GameCube", "Microsoft Windows", "Nintendo DS", "Game Boy Advance"] },
-            { id: 22, title: "Need for Speed: Most Wanted", cover: "https://images.launchbox-app.com//7b1f8fdb-01a2-4d60-be2d-e61ae0c2e4f9.jpg", synopsis: "Recupere seu carro e suba na Blacklist dos 15 corredores mais procurados enquanto foge da polícia em perseguições cinematográficas. O jogo combina corridas ilegais em mundo aberto e uma narrativa centrada em rivalidade e vingança.", developer: "EA Black Box", publisher: "Electronic Arts", date: "15/11/2005", age: "Teen", platforms: ["PlayStation 2", "Xbox", "Xbox 360", "GameCube", "Nintendo DS", "Microsoft Windows"] },
-            { id: 8, title: "Need for Speed: Underground", cover: "https://images.launchbox-app.com//4b40c834-4ac5-4ed1-8083-0acf3db0ad86.jpg", synopsis: "Mergulhe na cultura de corridas ilegais e tuning. Comece do baixo e ganhe respeito em eventos de drift, drag e circuito, transformando carros comuns em máquinas de alto desempenho. Com trilha sonora marcante, atmosfera urbana vibrante e foco total na cultura do tuning, Need for Speed: Underground redefiniu o gênero das corridas de rua.", developer: "EA Black Box", publisher: "Electronic Arts", date: "17/11/2003", age: "Everyone", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Game Boy Advance"] },
-            { id: 9, title: "Need for Speed: Underground 2", cover: "https://images.launchbox-app.com//153c31dc-17c1-4cb4-9983-7c107a9d5bfb.jpg", synopsis: "Explore o mundo aberto de Bayview. Após ser sabotado, você retorna para reconstruir sua reputação, personalizando cada detalhe do carro e enfrentando gangues rivais para derrubar Caleb Reece. O jogo introduz um sistema revolucionário de personalização, permitindo modificar quase todos os aspectos do carro.", developer: "EA Black Box", publisher: "Electronic Arts", date: "09/11/2004", age: "Everyone", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Game Boy Advance", "Nintendo DS"] },
-            { id: 18, title: "Obscure", cover: "https://images.launchbox-app.com//8ad7a83a-ec50-4c50-849d-abda76ac2bde.jpg", synopsis: "Survival horror cooperativo em uma escola americana. Estudantes enfrentam mutações causadas por experimentos biológicos. A morte de um personagem é permanente. O jogador deve explorar corredores, laboratórios e áreas secretas, resolvendo quebra-cabeças.", developer: "Hydravision Entertainment", publisher: "Playlogic", date: "23/09/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"] },
-            { id: 19, title: "Obscure II: The Aftermath", cover: "https://images.launchbox-app.com//cf66f75a-1330-4a8b-b5e6-ecb19f0b1b8b.jpg", synopsis: "A continuação leva o horror para a universidade. Sobreviventes e novos alunos lidam com uma nova flor alucinógena que causa mutações grotescas. O jogador controla vários personagens, cada um com habilidades únicas, alternando entre eles.", developer: "Hydravision Entertainment", publisher: "Playlogic", date: "06/11/2007", age: "Mature 17+", platforms: ["PlayStation 2", "PSP", "Microsoft Windows"] },
-            { id: 2, title: "Pro Evolution Soccer 2010", cover: "https://images.launchbox-app.com//9ef7aba5-9dc1-4bd7-a527-b46df4646a05.jpg", synopsis: "Pro Evolution Soccer 2010 marca uma das versões mais refinadas da franquia, trazendo um foco maior em realismo, equilíbrio de jogabilidade e inteligência artificial aprimorada. O jogo aposta na precisão dos passes, no controle mais estratégico do ataque e na movimentação mais realista dos jogadores, permitindo que cada partida tenha ritmo e identidade própria — aproximando-se mais do futebol real.", developer: "Konami Computer Entertainment Tokyo", publisher: "Konami", date: "23/10/2009", age: "Livre", platforms: ["Microsoft Windows", "PlayStation 3", "PlayStation 2", "PSP", "Xbox 360", "Wii", "Mobile"] },
-            { id: 56, title: "Red Dead Redemption II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/55247-1.jpg", synopsis: "Arthur Morgan e a gangue Van der Linde são forçados a fugir. Com agentes federais e os melhores caçadores de recompensas em seu encalço, a gangue deve roubar e lutar para sobreviver no coração da América.", developer: "Rockstar Games", publisher: "Rockstar Games", date: "26/10/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"] },
-            { id: 58, title: "Resident Evil 2 Remake", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/56094-1.jpg", synopsis: "Uma recriação magistral do clássico de horror. Leon Kennedy e Claire Redfield tentam escapar de Raccoon City, enfrentando zumbis aterrorizantes e o implacável Mr. X na icônica delegacia de polícia.", developer: "Capcom", publisher: "Capcom", date: "25/01/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"] },
-            { id: 50, title: "Resident Evil 7: Biohazard – Gold Edition", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/52435-1.jpg", synopsis: "Ethan Winters busca sua esposa em uma plantação abandonada, caindo nas garras da insana família Baker. A perspectiva em primeira pessoa intensifica o terror e a imersão neste survival horror visceral.", developer: "Capcom", publisher: "Capcom", date: "24/01/2017", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"] },
-            { id: 35, title: "Resident Evil: Operation Raccoon City", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/12643-1.jpg", synopsis: "Uma abordagem de ação e tiro no universo de Resident Evil. O jogador controla soldados da Umbrella Security Service com a missão de encobrir as evidências do surto em Raccoon City, enfrentando zumbis e forças militares.", developer: "Slant Six Games", publisher: "Capcom", date: "20/03/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"] },
-            { id: 25, title: "Saint Seiya: The Hades Saga", cover: "https://images.launchbox-app.com//b82f3562-38fb-4a2b-bfcc-4ababa433791.jpg", synopsis: "A batalha continua no submundo contra os Espectros de Hades. Gráficos melhorados e jogabilidade mais rápida focada na Saga de Hades. A história se concentra na Saga de Hades, na qual os protagonistas devem atravessar o Inferno.", developer: "Dimps", publisher: "Bandai Namco", date: "15/12/2007", age: "Teen", platforms: ["PlayStation 2"] },
-            { id: 24, title: "Saint Seiya: The Sanctuary", cover: "https://images.launchbox-app.com//66b656c6-e4a1-4a5c-be1d-fe7fc6410ab0.jpg", synopsis: "Reviva a Batalha das 12 Casas. Seiya e os Cavaleiros de Bronze devem derrotar os Cavaleiros de Ouro para salvar Atena em lutas 3D. O jogo foca na Batalha do Santuário, a primeira grande saga da série.", developer: "Dimps", publisher: "Bandai Namco", date: "27/07/2005", age: "Teen", platforms: ["PlayStation 2"] },
-            { id: 3, title: "Shadow of Rome", cover: "https://images.launchbox-app.com//ce022020-050d-4665-b82b-35b384b15893.jpg", synopsis: "Ambientado na Roma Antiga, mistura ação brutal e espionagem. O general Agripa luta na arena como gladiador para salvar seu pai, enquanto Octavianus usa furtividade para investigar o assassinato de Júlio César. Os caminhos dos dois se cruzam em uma trama cheia de reviravoltas envolvendo poder, manipulação, corrupção e a crueldade dos jogos romanos.", developer: "Capcom Production Studio 2", publisher: "Capcom", date: "04/02/2005", age: "Mature 17+", platforms: ["PlayStation 2"] },
-            { id: 23, title: "Silent Hill 3", cover: "https://images.launchbox-app.com//a1829960-26a1-433c-adae-856290481792.png", synopsis: "Heather Mason descobre sua ligação com a cidade maldita. Terror psicológico intenso, visuais perturbadores e a busca pela verdade sobre seu pai. Heather precisa enfrentar criaturas grotescas e quebra-cabeças complexos.", developer: "Konami KC Tokyo", publisher: "Konami", date: "28/08/2003", age: "Mature 17+", platforms: ["PlayStation 2", "Microsoft Windows"] },
-            { id: 26, title: "Silent Hill 4: The Room", cover: "https://images.launchbox-app.com//4aecb03b-db0a-4756-a06c-522235476955.jpg", synopsis: "Henry Townshend está preso em seu apartamento. Buracos misteriosos o levam a mundos de pesadelo enquanto ele tenta escapar do serial killer Walter Sullivan. A narrativa acompanha Henry enquanto ele explora mundos paralelos e distorcidos.", developer: "Konami KC Tokyo", publisher: "Konami", date: "09/11/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Microsoft Windows"] },
-            { id: 36, title: "Skate 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/13473-1.jpg", synopsis: "Simulação definitiva de skate em Port Carverton. Com o sistema de controle Flickit, o jogo oferece liberdade total para realizar manobras, criar parques e participar de desafios em equipe, focando na cultura do skate.", developer: "EA Black Box", publisher: "Electronic Arts", date: "14/05/2010", age: "Teen", platforms: ["PlayStation 3", "Xbox 360"] },
-            { id: 40, title: "Sleeping Dogs", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/11689-1.jpg", synopsis: "Wei Shen, um policial infiltrado, tenta desmantelar a Tríade Sun On Yee em Hong Kong. O jogo mistura combate de artes marciais, tiroteios e direção em um mundo aberto urbano vibrante e perigoso.", developer: "United Front Games", publisher: "Square Enix", date: "14/08/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"] },
-            { id: 52, title: "South Park: The Fractured But Whole", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/50582-1.jpg", synopsis: "O crime está em alta em South Park. O Guaxinim e Amigos, liderados por Cartman, devem salvar o dia. Crie seu próprio super-herói, escolha sua origem e use poderes ultrajantes.", developer: "Ubisoft San Francisco", publisher: "Ubisoft", date: "17/10/2017", age: "Mature", platforms: ["PlayStation 4", "Xbox One", "Nintendo Switch", "Microsoft Windows"] },
-            { id: 51, title: "South Park: The Stick of Truth", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/51105-1.jpg", synopsis: "Dos criadores de South Park, uma busca épica para se tornar... descolado. Junte-se a Cartman, Kyle, Stan e Kenny em um RPG hilário e ofensivo para salvar a cidade.", developer: "Obsidian Entertainment", publisher: "Ubisoft", date: "06/03/2014", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "PlayStation 4", "Xbox One"] },
-            { id: 45, title: "The Elder Scrolls V: Skyrim", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/8909-1.jpg", synopsis: "Como o Dragonborn, o herói profetizado com o poder da Voz, você deve salvar o mundo de Alduin, o Devorador de Mundos. Um RPG de mundo aberto vasto onde você pode ser quem quiser e fazer o que quiser.", developer: "Bethesda Game Studios", publisher: "Bethesda Softworks", date: "11/11/2011", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Nintendo Switch"] },
-            { id: 27, title: "The Godfather", cover: "https://images.launchbox-app.com//008a24be-f595-487f-bb49-a19dfd7afaa9.jpg", synopsis: "Suba na hierarquia da família Corleone na Nova York dos anos 40. Extorsão, tiroteios e guerras de família em um mundo aberto fiel ao filme. O jogador assume o papel de um novo recruta da família Corleone em busca de poder.", developer: "EA Redwood Shores", publisher: "Electronic Arts", date: "24/03/2006", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"] },
-            { id: 32, title: "The Last of Us", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/10392-1.jpg", synopsis: "Em um mundo pós-apocalíptico devastado por um fungo, Joel, um sobrevivente endurecido, deve escoltar Ellie, uma adolescente imune, através de uma América perigosa. A narrativa profundamente emocional explora temas de perda e sobrevivência.", developer: "Naughty Dog", publisher: "Sony Computer Entertainment", date: "14/06/2013", age: "Mature", platforms: ["PlayStation 3", "PlayStation 4", "PlayStation 5"] },
-            { id: 70, title: "The Last of Us Part II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/55731-1.jpg", synopsis: "Cinco anos após sua jornada perigosa, Ellie e Joel se estabeleceram em Jackson. Quando um evento violento perturba a paz, Ellie embarca em uma jornada implacável para fazer justiça e encontrar um desfecho.", developer: "Naughty Dog", publisher: "Sony Interactive Entertainment", date: "19/06/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"] },
-            { id: 15, title: "The Matrix: Path of Neo", cover: "https://images.launchbox-app.com//fe567622-36f0-4852-a127-b057512f5108.png", synopsis: "Reviva a jornada de Neo desde Thomas Anderson até se tornar O Escolhido. Use poderes sobrenaturais e kung-fu para enfrentar agentes e o exército de Smith. O jogador experimenta combate acrobático em câmera lenta, tiroteios cinematográficos e batalhas contra múltiplos inimigos.", developer: "Shiny Entertainment", publisher: "Atari", date: "08/11/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Microsoft Windows", "GameCube"] },
-            { id: 12, title: "The Simpsons: Hit & Run", cover: "https://images.launchbox-app.com//1bbb7d22-b337-439e-95e3-763fb939e40b.jpg", synopsis: "Springfield é invadida por vespas-robôs e câmeras misteriosas. A família Simpson investiga uma conspiração alienígena em uma jogabilidade de mundo aberto caótica e cheia de humor. Homer, Bart, Lisa, Marge e Apu embarcam numa investigação improvisada para salvar a cidade.", developer: "Radical Entertainment", publisher: "Vivendi Universal Games", date: "16/09/2003", age: "Teen", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"] },
-            { id: 31, title: "Tom Clancy’s Splinter Cell: Blacklist", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/17669-1.jpg", synopsis: "O jogador assume o papel de Sam Fisher, agente especial da Third Echelon. A missão de Sam é enfrentar uma nova ameaça terrorista chamada “The Engineers”. O jogo combina infiltração, combate furtivo e ação tática, permitindo escolhas entre abordagens silenciosas ou confrontos diretos.", developer: "Ubisoft Toronto", publisher: "Ubisoft", date: "20/08/2013", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Wii U", "Microsoft Windows"] },
-            { id: 7, title: "True Crime: New York City", cover: "https://images.launchbox-app.com//f54bee5e-e31b-4c6d-a338-6679cc26c4c3.jpg", synopsis: "Marcus Reed, ex-criminoso tornado policial, busca vingança pela morte de seu mentor nas ruas de Manhattan. O jogador pode escolher ser um policial honesto ou corrupto em um mundo aberto detalhado. O jogador é lançado em uma versão sombria e detalhada da cidade de Nova York, repleta de corrupção policial, máfia e gangues.", developer: "Luxoflux", publisher: "Activision", date: "15/11/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"] },
-            { id: 10, title: "True Crime: Streets of LA", cover: "https://images.launchbox-app.com//e88512ca-c6b3-44aa-b58f-58b5548c5145.jpg", synopsis: "Nick Kang, um policial rebelde da E.O.D., investiga tríades e a máfia russa em Los Angeles. O jogo mistura tiroteios, artes marciais e direção em uma recriação precisa de LA. A jogabilidade combina tiroteios cinematográficos, combate corpo a corpo no estilo de artes marciais e perseguições intensas.", developer: "Luxoflux", publisher: "Activision", date: "04/11/2003", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Mobile"] },
-            { id: 42, title: "Uncharted 3: Drake's Deception", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/2264-1.jpg", synopsis: "Nathan Drake busca a lendária 'Atlântida das Areias' no deserto da Arábia. Uma aventura cinematográfica repleta de ação, quebra-cabeças e cenários espetaculares, explorando o passado de Drake.", developer: "Naughty Dog", publisher: "Sony Computer Entertainment", date: "01/11/2011", age: "Teen", platforms: ["PlayStation 3", "PlayStation 4"] },
-            { id: 73, title: "OPL (Open PS2 Loader)", cover: "https://raw.githubusercontent.com/Marcelo9035/IMAGES/refs/heads/main/ChatGPT%20Image%2021%20de%20nov.%20de%202025%2C%2021_58_01.png", synopsis: "Open PS2 Loader (OPL) não é um jogo, mas sim um software homebrew extremamente popular no PlayStation 2 que permite aos usuários rodarem jogos de maneiras alternativas e mais rápidas. Criado pela comunidade, o OPL tornou-se a principal ferramenta para carregar jogos digitalmente no PS2, prolongando a vida do console mesmo décadas após seu lançamento.<br><br>O OPL permite executar games diretamente de um HD interno, pendrive, cartão de memória ou rede via Ethernet, oferecendo tempos de carregamento muito menores do que os discos originais. Além disso, ele organiza a biblioteca de jogos com uma interface simples, personalizável e eficiente, facilitando navegar, escolher e executar títulos de PS2 com praticidade.<br><br>O software também adiciona recursos modernos ao console, como possibilidade de usar capas, ícones, modos de compatibilidade, salvamentos otimizados e suporte a inúmeras configurações avançadas que melhoram a experiência do usuário. Para colecionadores, técnicos e jogadores que desejam preservar seus jogos ou evitar desgaste no leitor de disco, o OPL se tornou a ferramenta definitiva.<br><br><strong>🎮 DESCRIÇÃO TÉCNICA</strong><br>O OPL é um homebrew open-source desenvolvido para o PlayStation 2.<br>Ele permite:<br>• Carregar jogos através de USB<br>• Carregar jogos pelo HDD interno (Modelos FAT)<br>• Carregar jogos pela rede (SMB)<br>• Suporte a VMC (Memory Card Virtual)<br>• Suporte a mídia externa e temas personalizados", developer: "Comunidade Open Source", publisher: "Homebrew", date: "01/01/2009", age: "Livre", platforms: ["PlayStation 2"], languageOption: "Multilinguagem", mediaType: "Digital" },
-            { id: 74, title: "Need for Speed (2016)", cover: "https://images.launchbox-app.com//52afc816-dcdf-4015-b06a-9964d9c89a50.jpg", synopsis: "Need for Speed (2016) reinicia a franquia trazendo uma experiência totalmente focada no estilo de vida das ruas, onde velocidade, estilo e reputação definem quem você é. Ambientado em Ventura Bay, o jogador se junta a uma nova geração de pilotos que vivem pela adrenalina das corridas noturnas ilegais.<br><br>A história gira em torno de cinco lendas do automobilismo real — incluindo nomes como Ken Block, Magnus Walker e Akira Nakai — que servem como inspiração para cinco estilos de jogo: Velocidade, Estilo, Construção, Equipe e Força.<br><br>À medida que o jogador aprimora seus carros, desafia rivais, foge da polícia e domina cada disciplina, ele busca alcançar um único objetivo: tornar-se uma lenda viva das ruas. Com fortes elementos de narrativa em FMV, personalização extrema e corridas cinematográficas, Need for Speed (2016) celebra a cultura automotiva moderna enquanto coloca o jogador no centro do submundo da velocidade.", developer: "Ghost Games", publisher: "Electronic Arts", date: "03/11/2015", age: "Teen", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: "Digital" },
-            { id: 75, title: "Need for Speed: Payback", cover: "https://images.launchbox-app.com//74587a4d-8589-4541-b6e3-b931fa69fdf5.jpg", synopsis: "Need for Speed: Payback coloca o jogador em Fortune Valley, uma cidade inspirada em Las Vegas controlada por um cartel criminoso chamado O Coletivo (“The House”), que manipula corridas clandestinas, cassinos e até a própria polícia. A história acompanha três protagonistas — Tyler Morgan (The Racer), Mac (The Showman) e Jess (The Wheelman) — após serem traídos durante um grande golpe que dá errado.<br><br>Buscando vingança e dispostos a derrubar toda a organização que domina a cidade, o trio se une novamente formando uma equipe especializada em diferentes estilos de pilotagem. Juntos, eles enfrentam corridas ilegais, desafios de drift, fugas cinematográficas, destruição de veículos e missões dignas de filmes de ação.<br><br>A narrativa combina velocidade extrema com cenas explosivas, assaltos em alta velocidade, perseguições policiais e disputas contra gangues rivais. Para enfrentar o Coletivo, os jogadores precisam construir carros altamente personalizados, participar de eventos variados e conquistar reputação nas ruas.<br><br>Em Payback, a luta deixa de ser apenas por vitória nas pistas — é pela sobrevivência, justiça e desforra contra a maior organização criminosa da região. Uma jornada de adrenalina, velocidade e vingança.", developer: "Ghost Games", publisher: "Electronic Arts", date: "10/11/2017", age: "Teen", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: "Digital" },
-            { id: 76, title: "Need for Speed Heat", cover: "https://gamesdb-images.launchbox.gg/r2_d1038a48-de9a-44ae-9eaf-aacadae84ab6.jpg", synopsis: "Need for Speed: Heat leva o jogador para Palm City, uma metrópole vibrante inspirada em Miami, onde corridas de rua, cultura automotiva e corrupção policial se misturam em um ambiente explosivo.<br><br>De dia, Palm City oferece o Speedhunters Showdown, um campeonato legalizado no qual pilotos competem para ganhar dinheiro e melhorar seus carros. Mas quando a noite chega, tudo muda: as corridas se tornam clandestinas, e o risco aumenta drasticamente. A polícia — liderada pela implacável e corrupta Lt. Mercer — patrulha as ruas com brutalidade, confiscando carros e perseguindo pilotos sem piedade.<br><br>O jogador assume o papel de um corredor novato que chega à cidade em busca de fama, respeito e da chance de se tornar uma lenda do underground. Para isso, é preciso equilibrar glória, perigo e velocidade, construindo reputação à noite e acumulando dinheiro durante o dia para criar máquinas poderosas e personalizadas.<br><br>A narrativa acompanha a luta contra uma força policial criminosa, revelando esquemas ilegais, traições e alianças improváveis. Com liberdade de exploração, clima dinâmico e carros altamente modificáveis, Heat busca resgatar a essência da franquia — unindo cultura de rua, identidade visual forte e perseguições intensas.<br><br>Em Palm City, cada corrida é um risco. Cada vitória, um passo rumo ao topo. E cada noite, uma batalha pela sobrevivência nas ruas iluminadas por neon.", developer: "Ghost Games", publisher: "Electronic Arts", date: "08/11/2019", age: "Teen", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: "Digital" },
-            { id: 77, title: "Resident Evil Village", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/81900-1.jpg", synopsis: "Resident Evil Village continua a jornada de Ethan Winters, alguns anos após os eventos traumáticos de Resident Evil 7. Vivendo aparentemente em paz com sua esposa Mia e sua filha recém-nascida, Rose, Ethan vê sua vida ruir novamente quando Chris Redfield, agora mais sombrio e enigmático, invade sua casa e sequestra sua filha.<br><br>Desesperado, Ethan desperta em uma região remota da Europa Oriental, um vilarejo isolado cercado por florestas densas, castelos ancestrais e criaturas grotescas. O local está tomado por monstros e controlado por quatro líderes terríveis, todos submetidos à misteriosa figura chamada Mãe Miranda.<br><br>Enquanto explora o vilarejo, Ethan enfrenta lobisomens, experimentos mutantes e horrores que desafiam sua sanidade, investigando segredos sombrios que conectam a biotecnologia da série à tradição folclórica da região. Seu objetivo é claro: encontrar Rose e sobreviver ao pesadelo.<br><br>A trama o leva ao icônico Castelo Dimitrescu, lar da imponente Lady Dimitrescu e suas filhas sanguinárias, e a outras áreas igualmente mortais, cada uma com estilo, criaturas e desafios próprios.<br><br>Com atmosfera intensa, narrativa dramática e foco em ação com elementos de terror psicológico, Resident Evil Village aprofunda o destino dos Winters e expande a mitologia da franquia, revelando verdades chocantes sobre Chris, Miranda e a origem de Rose.", developer: "Capcom Production Studio 1", publisher: "Capcom", date: "07/05/2021", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: "Digital" },
-            { id: 78, title: "Dying Light 2: Stay Human", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/77526-1.jpg", synopsis: "Dying Light 2 se passa mais de vinte anos após os eventos do primeiro jogo, em um mundo devastado onde a civilização entrou em colapso e a infecção tomou conta da maior parte do planeta. A história segue Aiden Caldwell, um errante marcado por um passado traumático e em busca de sua irmã desaparecida, Mia.<br><br>Aiden chega à Cidade (Villedor), um dos últimos grandes refúgios da humanidade, agora dividido entre facções hostis que lutam por poder, recursos e sobrevivência. Suas escolhas moldam diretamente o destino da cidade, alterando territórios, alianças, personagens e até a própria paisagem urbana.<br><br>Durante o dia, sobreviventes batalham por controle e estabilidade. À noite, o pesadelo começa: os infectados se tornam mais agressivos, mutações perigosas emergem e os becos se transformam em armadilhas vivas. Aiden, também infectado, conta com habilidades sobre-humanas e um sistema de parkour avançado para escapar, explorar e lutar.<br><br>A narrativa mistura drama, política, mistério e terror, enquanto Aiden enfrenta ameaças humanas e monstros, desvendando segredos sobre experimentos, a origem da infecção e sua própria condição. Cada decisão pode salvar vidas… ou condenar toda uma comunidade.", developer: "Techland", publisher: "Techland Publishing", date: "04/02/2022", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Nintendo Switch"], languageOption: "Dublado", mediaType: "Digital" },
-            { id: 79, title: "Far Cry 6", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/74767-1.jpg", synopsis: "Em Far Cry 6, você é Dani Rojas, um guerrilheiro relutante que se vê arrastado para o coração de uma revolução brutal. A história se passa em Yara, uma ilha caribenha congelada no tempo e governada com punho de ferro pelo ditador Antón Castillo, interpretado por Giancarlo Esposito.<br><br>Castillo promete restaurar a glória de Yara usando o Vivir, um tratamento revolucionário criado a partir do tabaco local — mas produzido às custas da opressão, trabalho forçado e violência extrema. Ao lado do filho Diego, que ele tenta moldar como seu sucessor perfeito, Antón transforma a ilha em um verdadeiro regime de terror.<br><br>Como parte da resistência Libertad, Dani deve explorar selvas densas, cidades vibrantes e praias paradisíacas enquanto une facções rebeldes, derruba bases militares e enfrenta o poder esmagador do exército de Castillo.<br><br>É uma jornada explosiva de guerrilha moderna repleta de armas improvisadas, caos tropical e decisões que moldam o destino de um povo. No fim, a luta de Dani não é apenas pela liberdade de Yara… mas também pelo seu próprio futuro.", developer: "Ubisoft Toronto", publisher: "Ubisoft", date: "07/10/2021", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: "Digital" },
-            { id: 80, title: "Resident Evil 3 Remake", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/69042-1.jpg", synopsis: "Resident Evil 3 Remake revisita os eventos que antecedem e acompanham o colapso total de Raccoon City, reimaginando o clássico de 1999 com narrativa expandida, gráficos modernos e atmosfera cinematográfica.<br><br>A história acompanha Jill Valentine, ex-integrante da S.T.A.R.S., uma das últimas sobreviventes a conhecer a verdade sobre a Umbrella Corporation. Enquanto tenta fugir da cidade tomada pelo T-Vírus, Jill se torna o alvo prioritário de uma arma biológica implacável: Nemesis, uma criatura inteligente, veloz e equipada para caçar e eliminar qualquer membro dos S.T.A.R.S.<br><br>Durante sua fuga desesperada, Jill encontra Carlos Oliveira, soldado da U.B.C.S. (Umbrella Biohazard Countermeasure Service), que luta para resgatar civis em meio ao caos — mesmo sem saber toda a verdade por trás da corporação que o contratou. Juntos, eles enfrentam hordas de zumbis, mutações grotescas e a destruição crescente da cidade, que está à beira de ser totalmente erradicada.<br><br>A narrativa alterna sequências tensas de perseguição, momentos de ação intensa e investigações sobre o colapso de Raccoon City, aprofundando conexões diretas com os acontecimentos de Resident Evil 2.<br><br>Enquanto o governo se prepara para destruir a cidade, Jill trava sua batalha final contra Nemesis, lutando não apenas por sua sobrevivência, mas também pela chance de expor os crimes da Umbrella ao mundo.", developer: "Capcom Production Studio 1", publisher: "Capcom", date: "03/04/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Dublado", mediaType: "Digital" },
-            { id: 81, title: "Until Dawn", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/24327-1.jpg", synopsis: "Em Until Dawn, oito amigos retornam a um chalé isolado nas montanhas Blackwood exatamente um ano após o misterioso desaparecimento das irmãs gêmeas Hannah e Beth. O reencontro, que deveria ser uma noite de diversão, rapidamente se transforma em um pesadelo quando forças sombrias passam a caçá-los.<br><br>Presos pela neve, sem contato com o mundo exterior e cercados por perigos desconhecidos, os jovens precisam tomar decisões difíceis para sobreviver até o amanhecer. Cada escolha feita — desde um simples diálogo até decisões de vida ou morte — altera o rumo da narrativa, determinando quem viverá e quem encontrará um destino brutal.<br><br>Misturando terror psicológico, lendas indígenas, criaturas aterradoras e segredos macabros escondidos na montanha, Until Dawn é uma experiência cinematográfica interativa onde o destino dos personagens está inteiramente nas mãos do jogador.", developer: "Supermassive Games", publisher: "Sony Computer Entertainment", date: "25/08/2015", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"], languageOption: "Dublado", mediaType: "Digital" }
+            { id: 5, title: "Altered Beast", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/4007-1.jpg", synopsis: "Luke Custer, um agente da Genome Cyber Force, descobre que pode se transformar em bestas monstruosas como lobisomem e dragão. Ele luta contra horrores biotecnológicos para recuperar sua memória e impedir uma ameaça global. O jogo mistura ação, mutações grotescas e clima de terror biotecnológico.", developer: "SEGA Wow", publisher: "SEGA", date: "27/01/2005", age: "Mature", platforms: ["PlayStation 2"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 47, title: "Assassin’s Creed Odyssey", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/102951-1.jpg", synopsis: "Escreva sua própria odisseia épica e torne-se um lendário herói espartano. Molde seu destino em um mundo onde cada escolha importa. Testemunhe a grandeza da Grécia Antiga em meio à guerra.", developer: "Ubisoft Quebec", publisher: "Ubisoft", date: "05/10/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 67, title: "Assassin’s Creed Origins", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/50681-1.jpg", synopsis: "Viaje para o Antigo Egito, o lugar mais misterioso da história, durante um período crucial que moldará o mundo. Descubra os segredos por trás das Grandes Pirâmides, mitos esquecidos e a origem da Irmandade dos Assassinos.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "27/10/2017", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 46, title: "Assassin’s Creed Valhalla", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/72400-1.jpg", synopsis: "Torne-se Eivor, um lendário invasor viking em busca de glória. Explore a Idade das Trevas da Inglaterra, ataque seus inimigos, amplie seu assentamento e construa seu poder político.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "10/11/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 34, title: "Batman: Arkham City", cover: "https://images.launchbox-app.com//cc3528af-a8f8-40ff-92c3-59e164454e4f.jpg", synopsis: "Batman explora Arkham City, uma enorme prisão a céu aberto onde os criminosos de Gotham foram confinados. O jogo combina combate fluido, gadgets avançados e uma narrativa sombria envolvendo o Coringa, Hugo Strange e outros vilões icônicos.", developer: "Rocksteady Studios", publisher: "Warner Bros. Interactive", date: "18/10/2011", age: "Teen", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "Wii U"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 29, title: "Beat Down: Fists of Vengeance", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/27852-1.jpg", synopsis: "Traídos pela máfia, cinco lutadores buscam vingança. Briga de rua brutal, recrutamento de capangas e negociações no submundo. O jogador assume o papel de um dos cinco protagonistas, cada um com habilidades únicas.", developer: "Cavia Inc.", publisher: "Capcom", date: "27/10/2005", age: "Mature 17+", platforms: ["PlayStation 2"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 44, title: "Beyond: Two Souls", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/15320-1.jpg", synopsis: "Jodie Holmes possui uma ligação com uma entidade sobrenatural chamada Aiden. O jogador vive 15 anos da vida de Jodie, tomando decisões que moldam seu destino nesta aventura narrativa interativa.", developer: "Quantic Dream", publisher: "Sony Computer Entertainment", date: "08/10/2013", age: "Mature", platforms: ["PlayStation 3", "PlayStation 4", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Físico"] },
+            { id: 28, title: "Black", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/3942-1.jpg", synopsis: "O 'Pornografia de Armas'. Um FPS focado em destruição total de cenários e som ensurdecedor de tiroteios. Ação pura sem mecânicas de stealth. O jogo foca em combates realistas e destruição ambiental.", developer: "Criterion Games", publisher: "Electronic Arts", date: "15/02/2006", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 6, title: "Bloody Roar 4", cover: "https://images.launchbox-app.com//e69d8017-41cd-4b1c-a7e9-45799a7158f1.jpg", synopsis: "A força 'Unborn' desperta, ameaçando humanos e Zoanthropes. Lutadores clássicos e novos personagens se enfrentam em combates onde podem se transformar em feras violentas no meio da luta. Bloody Roar 4 entrega uma trama mais sombria, com foco em possessão, sacrifício e poder incontrolável.", developer: "Eighting / Raizing", publisher: "Hudson Soft / Konami", date: "11/12/2003", age: "Teen", platforms: ["PlayStation 2"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 17, title: "Bully", cover: "https://gamesdb-images.launchbox.gg/r2_8a7302f4-361d-4a0a-a484-4c686797af4c.jpg", synopsis: "Jimmy Hopkins navega pela hierarquia social da Bullworth Academy. Enfrente valentões, assista aulas e pregue peças neste mundo aberto escolar satírico. O jogador deve cumprir missões que variam de trapaças e brigas até entregas e corridas de bicicletas.", developer: "Rockstar Vancouver", publisher: "Rockstar Games", date: "17/10/2006", age: "Teen", platforms: ["PlayStation 2", "Xbox 360", "Wii", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 37, title: "Call of Duty: Black Ops II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/9936-1.jpg", synopsis: "FPS que transita entre os anos 1980 e 2025. Acompanhe Alex e David Mason enfrentando o terrorista Raul Menendez. O jogo introduz narrativa ramificada, armas futuristas e um robusto modo multiplayer e Zombies.", developer: "Treyarch", publisher: "Activision", date: "13/11/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "Wii U"], languageOption: "Dublado", mediaType: ["Físico"] },
+            { id: 71, title: "Call of Duty: Infinite Warfare", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/36616-1.jpg", synopsis: "A guerra se expande para o sistema solar. Como Capitão Reyes, lidere as forças remanescentes da coalizão contra um inimigo implacável. Combate em gravidade zero, batalhas espaciais e uma narrativa cinematográfica.", developer: "Infinity Ward", publisher: "Activision", date: "04/11/2016", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 39, title: "Call of Duty: Modern Warfare 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/8303-1.jpg", synopsis: "Conclusão da trilogia Modern Warfare. Price e Soap perseguem Makarov em uma guerra global que se espalha por Nova York, Londres e Paris. Ação cinematográfica intensa e multiplayer competitivo refinado.", developer: "Infinity Ward / Sledgehammer", publisher: "Activision", date: "08/11/2011", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "Wii"], languageOption: "Dublado", mediaType: ["Físico"] },
+            { id: 49, title: "Cyberpunk 2077", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/77520-1.jpg", synopsis: "Uma história de ação e aventura de mundo aberto ambientada em Night City, uma megalópole obcecada por poder, glamour e modificações corporais. Você joga como V, um mercenário fora da lei atrás de um implante único.", developer: "CD Projekt Red", publisher: "CD Projekt", date: "10/12/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: ["Físico", "Digital"] },
+            { id: 57, title: "Days Gone", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/38442-1.jpg", synopsis: "Pilote e lute em uma América mortal pós-pandemia. Deacon St. John, um errante e caçador de recompensas, busca uma razão para viver enquanto enfrenta gangues humanas e hordas aterrorizantes de Freakers.", developer: "Bend Studio", publisher: "Sony Interactive Entertainment", date: "26/04/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 59, title: "Dead Rising 4: Frank's Big Package", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/51662-1.jpg", synopsis: "Frank West retorna a Willamette para investigar um novo surto zumbi durante o Natal. Use um arsenal insano de armas combo e veículos para dizimar hordas em um mundo aberto caótico e divertido.", developer: "Capcom Vancouver", publisher: "Capcom", date: "06/12/2017", age: "Mature", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 54, title: "Death Stranding", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/38113-1.jpg", synopsis: "Sam Bridges deve enfrentar um mundo transformado pelo Death Stranding. Carregando os restos desconectados de nosso futuro, ele embarca em uma jornada para reconectar o mundo despedaçado, um passo de cada vez.", developer: "Kojima Productions", publisher: "Sony Interactive Entertainment", date: "08/11/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico", "Digital"] },
+            { id: 11, title: "Def Jam: Fight for NY", cover: "https://images.launchbox-app.com//093aedcd-bc6c-4670-86dc-85a81f56af83.jpg", synopsis: "Lute pelo controle do submundo de NY. Com a ajuda de D-Mob, enfrente a gangue de Crow (Snoop Dogg) usando estilos de luta variados e interagindo com lendas do Hip-Hop. As batalhas acontecem em cenários explosivos, como becos estreitos, metrôs em movimento e garagens em chamas.", developer: "EA Canada / AKI Corp", publisher: "Electronic Arts", date: "20/09/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 53, title: "Detroit: Become Human", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/48142-1.jpg", synopsis: "Em um futuro onde androides ganham consciência, o destino da humanidade e das máquinas está em suas mãos. Cada escolha molda uma narrativa ramificada intensa através dos olhos de três protagonistas androides.", developer: "Quantic Dream", publisher: "Sony Interactive Entertainment", date: "25/05/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 20, title: "Devil May Cry 3: Dante's Awakening", cover: "https://images.launchbox-app.com//f5e3b801-379a-4cb0-926b-69a5031717fd.jpg", synopsis: "Prequel que mostra o jovem Dante enfrentando seu irmão Vergil. Introduz o sistema de Estilos de Combate e define a personalidade irreverente do protagonista. O jogador acompanha Dante em sua jornada para enfrentar criaturas demoníacas e impedir que Vergil obtenha o poder de Sparda.", developer: "Capcom", publisher: "Capcom", date: "01/03/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Microsoft Windows", "PlayStation 3", "Xbox 360"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 16, title: "DRIV3R", cover: "https://images.launchbox-app.com//8ba9e7c6-5d7f-4207-9458-cdb572637d71.jpg", synopsis: "Tanner, um policial infiltrado, caça uma quadrilha de roubo de carros internacional em Nice, Miami e Istambul. Ação cinematográfica dentro e fora dos veículos. O jogo combina corridas de alta velocidade, perseguições intensas e missões de infiltração.", developer: "Reflections Interactive", publisher: "Atari", date: "21/06/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Microsoft Windows", "GameCube"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 63, title: "Dying Light: Enhanced Edition", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/34954-1.jpg", synopsis: "Sobreviva em uma cidade devastada por um vírus zumbi. Durante o dia, explore e colete recursos com parkour. À noite, os caçadores viram a caça. A edição Enhanced traz visuais melhorados e todo o conteúdo extra.", developer: "Techland", publisher: "Techland", date: "17/01/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Nintendo Switch"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 78, title: "Dying Light 2: Stay Human", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/77526-1.jpg", synopsis: "Dying Light 2 se passa mais de vinte anos após os eventos do primeiro jogo, em um mundo devastado onde a civilização entrou em colapso e a infecção tomou conta da maior parte do planeta. A história segue Aiden Caldwell, um errante marcado por um passado traumático e em busca de sua irmã desaparecida, Mia. Aiden chega à Cidade (Villedor), um dos últimos grandes refúgios da humanidade, agora dividido entre facções hostis que lutam por poder, recursos e sobrevivência. Suas escolhas moldam diretamente o destino da cidade, alterando territórios, alianças, personagens e até a própria paisagem urbana. Durante o dia, sobreviventes batalham por controle e estabilidade. À noite, o pesadelo começa: os infectados se tornam mais agressivos, mutações perigosas emergem e os becos se transformam em armadilhas vivas. Aiden, também infectado, conta com habilidades sobre-humanas e um sistema de parkour avançado para escapar, explorar e lutar. A narrativa mistura drama, política, mistério e terror, enquanto Aiden enfrenta ameaças humanas e monstros, desvendando segredos sobre experimentos, a origem da infecção e sua própria condição. Cada decisão pode salvar vidas… ou condenar toda uma comunidade.", developer: "Techland", publisher: "Techland Publishing", date: "04/02/2022", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Nintendo Switch"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 55, title: "EA Sports FC 24", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/119496-1.jpg", synopsis: "A nova era do Jogo de Todo Mundo. Com mais de 19.000 jogadores licenciados, 700 times e 30 ligas, oferece autenticidade incomparável e realismo aprimorado pela tecnologia HyperMotionV.", developer: "EA Vancouver", publisher: "Electronic Arts", date: "29/09/2023", age: "Everyone", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Nintendo Switch"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 14, title: "Enter the Matrix", cover: "https://images.launchbox-app.com//9e68fd38-9fa8-45b7-8629-20c06a0f8819.jpg", synopsis: "Jogue como Niobe ou Ghost em eventos paralelos a Matrix Reloaded. Combate com armas, artes marciais e direção, complementando a história dos filmes. A narrativa aprofunda a história de personagens secundários e revela segredos não mostrados nos filmes.", developer: "Shiny Entertainment", publisher: "Midway Games", date: "14/05/2003", age: "Teen", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Game Boy Advance"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 33, title: "Far Cry 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/113466-1.jpg", synopsis: "Jason Brody está de férias em uma ilha tropical que se transforma em um pesadelo dominado por piratas. Ele deve aprender a sobreviver, enfrentar o insano Vaas Montenegro e resgatar seus amigos em um mundo aberto vibrante e hostil.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "29/11/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 62, title: "Far Cry 5", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/52940-1.jpg", synopsis: "Bem-vindo a Hope County, Montana, terra dos livres e corajosos, mas também o lar de um culto apocalíptico fanático. Lidere a resistência para libertar a comunidade sitiada e acender o fogo da revolução.", developer: "Ubisoft Montreal", publisher: "Ubisoft", date: "27/03/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 79, title: "Far Cry 6", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/74767-1.jpg", synopsis: "Em Far Cry 6, você é Dani Rojas, um guerrilheiro relutante que se vê arrastado para o coração de uma revolução brutal. A história se passa em Yara, uma ilha caribenha congelada no tempo e governada com punho de ferro pelo ditador Antón Castillo, interpretado por Giancarlo Esposito. Castillo promete restaurar a glória de Yara usando o Vivir, um tratamento revolucionário criado a partir do tabaco local — mas produzido às custas da opressão, trabalho forçado e violência extrema. Ao lado do filho Diego, que ele tenta moldar como seu sucessor perfeito, Antón transforma a ilha em um verdadeiro regime de terror. Como parte da resistência Libertad, Dani deve explorar selvas densas, cidades vibrantes e praias paradisíacas enquanto une facções rebeldes, derruba bases militares e enfrenta o poder esmagador do exército de Castillo. É uma jornada explosiva de guerrilha moderna repleta de armas improvisadas, caos tropical e decisões que moldam o destino de um povo. No fim, a luta de Dani não é apenas pela liberdade de Yara… mas também pelo seu próprio futuro.", developer: "Ubisoft Toronto", publisher: "Ubisoft", date: "07/10/2021", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 69, title: "FIFA 18", cover: "https://images.launchbox-app.com//ae13a2e0-69d6-4c90-b378-22d43811e38d.jpg", synopsis: "Com a tecnologia Frostbite, o FIFA 18 confunde a linha entre o mundo virtual e o real. Acompanhe a jornada de Alex Hunter e experimente a atmosfera imersiva dos estádios mais famosos do mundo.", developer: "EA Canada", publisher: "Electronic Arts", date: "29/09/2017", age: "Everyone", platforms: ["PlayStation 4", "PlayStation 3", "Xbox One", "Xbox 360", "Nintendo Switch", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Físico"] },
+            { id: 72, title: "Ghost of Tsushima", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/88520-1.jpg", synopsis: "O jogador controla Jin Sakai, um samurai que deve proteger seu povo e sua terra natal, enfrentando tanto invasores mongóis quanto dilemas internos sobre honra e sacrifício. Para vencer, Jin adota técnicas tradicionais de samurai e estratégias furtivas, eventualmente assumindo a identidade do “Fantasma”.", developer: "Sucker Punch Productions", publisher: "Sony Interactive Entertainment", date: "17/07/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"], languageOption: "Dublado", mediaType: ["Físico", "Digital"] },
+            { id: 1, title: "God of War II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/111300-1.jpg", synopsis: "Após derrotar Ares e assumir o trono, Kratos se torna o novo Deus da Guerra. No entanto, seus métodos brutais o colocam em conflito direto com Zeus. Traído e mortalmente ferido, Kratos é salvo pela Titã Gaia e embarca em uma jornada para mudar seu destino, buscando as Irmãs do Destino para se vingar do Olimpo. O jogo culmina com Kratos desafiando Zeus e, ao final, iniciando uma revolta que mudaria para sempre o destino do Olimpo.", developer: "Santa Monica Studio", publisher: "Sony Computer Entertainment", date: "13/03/2007", age: "Mature 17+ / 18", platforms: ["PlayStation 2", "PlayStation 3", "PlayStation Vita"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 38, title: "God of War III", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/843-1.jpg", synopsis: "A conclusão épica da saga grega. Kratos escala o Monte Olimpo para se vingar de Zeus, enfrentando deuses e titãs em batalhas colossais. Conhecido por sua escala gigantesca e brutalidade visceral.", developer: "Santa Monica Studio", publisher: "Sony Computer Entertainment", date: "16/03/2010", age: "Mature", platforms: ["PlayStation 3", "PlayStation 4"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 60, title: "God of War (2018)", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/52805-1.jpg", synopsis: "Kratos, agora vivendo como homem nas terras dos Deuses Nórdicos, deve ensinar seu filho Atreus a sobreviver. Uma reinvenção ousada da série, focada em narrativa emocional, combate estratégico e exploração.", developer: "Santa Monica Studio", publisher: "Sony Interactive Entertainment", date: "20/04/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Físico", "Digital"] },
+            { id: 61, title: "God of War: Ragnarök", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/91197-1.jpg", synopsis: "O Fimbulwinter já começou. Kratos e Atreus devem viajar pelos Nove Reinos em busca de respostas enquanto as forças asgardianas se preparam para a batalha profetizada que causará o fim do mundo.", developer: "Santa Monica Studio", publisher: "Sony Interactive Entertainment", date: "09/11/2022", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 41, title: "Grand Theft Auto V", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/7917-1.jpg", synopsis: "Em Los Santos, três criminosos muito diferentes — Michael, Franklin e Trevor — arriscam tudo em uma série de assaltos ousados. Um mundo aberto massivo e detalhado com sátira social afiada.", developer: "Rockstar North", publisher: "Rockstar Games", date: "17/09/2013", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico", "Digital"] },
+            { id: 21, title: "GUN", cover: "https://images.launchbox-app.com//0fa13935-072f-4018-acce-8cc304085810.jpg", synopsis: "Colton White busca vingança no Velho Oeste. Um mundo aberto brutal com duelos, escalpes, cavalos e tiroteios intensos em uma história de fronteira. A história acompanha Colton enquanto ele descobre uma conspiração envolvendo corruptos políticos.", developer: "Neversoft", publisher: "Activision", date: "22/02/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Xbox 360", "GameCube", "Microsoft Windows"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 66, title: "Injustice 2", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/45935-1.jpg", synopsis: "Construa e fortaleça a versão definitiva de suas lendas favoritas da DC. Com uma enorme seleção de super-heróis e supervilões, continue a história cinematográfica épica iniciada em Injustice: Gods Among Us.", developer: "NetherRealm Studios", publisher: "Warner Bros. Interactive", date: "16/05/2017", age: "Teen", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 4, title: "Marvel Nemesis: Rise of the Imperfects", cover: "https://images.launchbox-app.com//a4a1cd56-c559-453b-8530-39c1d6622abb.jpg", synopsis: "Uma invasão alienígena liderada pelo cruel Imperial atinge a Terra para criar supersoldados. Heróis da Marvel como Wolverine e Homem-Aranha enfrentam os 'Imperfects' em batalhas brutais em arenas destrutíveis. Com uma atmosfera sombria e combates brutais, Marvel Nemesis se destaca por colocar os heróis clássicos frente a frente com uma nova ameaça.", developer: "Nihilistic Software / EA Canada", publisher: "Electronic Arts", date: "20/09/2005", age: "Teen", platforms: ["GameCube", "PlayStation 2", "PlayStation Portable (PSP)", "Nintendo DS", "Xbox"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 48, title: "Marvel’s Avengers", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/69109-1.jpg", synopsis: "Reúna os Heróis Mais Poderosos da Terra, abrace seus poderes e viva seus sonhos de super-herói. Uma história original dos Vingadores com modos cooperativos e combate único para cada herói.", developer: "Crystal Dynamics", publisher: "Square Enix", date: "04/09/2020", age: "Teen", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: ["Físico", "Digital"] },
+            { id: 68, title: "Marvel’s Spider-Man", cover: "https://images.launchbox-app.com//ded2ed1f-5ef1-4752-bfce-79ccef7d7b8f.jpg", synopsis: "Jogue como um Peter Parker experiente, combatendo grandes crimes em uma Nova York da Marvel. Com combate improvisado, acrobacias dinâmicas, travessia urbana fluida e interações com o ambiente.", developer: "Insomniac Games", publisher: "Sony Interactive Entertainment", date: "07/09/2018", age: "Teen", platforms: ["PlayStation 4", "PlayStation 5", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 43, title: "Max Payne 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/111402-1.jpg", synopsis: "Max Payne, agora trabalhando como segurança privada em São Paulo, Brasil, enfrenta seus demônios e gangues locais para proteger uma família rica. Tiroteios estilizados com Bullet Time e narrativa sombria.", developer: "Rockstar Studios", publisher: "Rockstar Games", date: "15/05/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 30, title: "Metal Slug", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/20017-1.jpg", synopsis: "Ação arcade clássica 'Run and Gun'. Marco, Tarma e equipe explodem tudo que se move, salvam prisioneiros e pilotam tanques Metal Slug. O jogo combina tiros frenéticos, veículos militares e ambientes destrutíveis.", developer: "SNK Playmore", publisher: "SNK", date: "14/11/2003", age: "Teen", platforms: ["PlayStation 2"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 64, title: "Middle-earth: Shadow of Mordor", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/39273-1.jpg", synopsis: "Talion, um guarda de Gondor, é ressuscitado pelo espírito de Celebrimbor. Juntos, eles buscam vingança contra Sauron. O inovador Sistema Nemesis cria inimigos únicos que se lembram de cada encontro.", developer: "Monolith Productions", publisher: "Warner Bros. Interactive", date: "03/09/2014", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 65, title: "Middle-earth: Shadow of War", cover: "https://m.media-amazon.com/images/I/71iOL3viCYL._AC_SX679_.jpg", synopsis: "Vá atrás das linhas inimigas para forjar seu exército, conquistar Fortalezas e dominar Mordor de dentro para fora. Experimente como o premiado Sistema Nemesis cria histórias pessoais únicas com cada inimigo e seguidor.", developer: "Monolith Productions", publisher: "Warner Bros. Interactive", date: "10/10/2017", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 74, title: "Need for Speed (2016)", cover: "https://images.launchbox-app.com//52afc816-dcdf-4015-b06a-9964d9c89a50.jpg", synopsis: "Need for Speed (2016) reinicia a franquia trazendo uma experiência totalmente focada no estilo de vida das ruas, onde velocidade, estilo e reputação definem quem você é. Ambientado em Ventura Bay, o jogador se junta a uma nova geração de pilotos que vivem pela adrenalina das corridas noturnas ilegais. A história gira em torno de cinco lendas do automobilismo real — incluindo nomes como Ken Block, Magnus Walker e Akira Nakai — que servem como inspiração para cinco estilos de jogo: Velocidade, Estilo, Construção, Equipe e Força. À medida que o jogador aprimora seus carros, desafia rivais, foge da polícia e domina cada disciplina, ele busca alcançar um único objetivo: tornar-se uma lenda viva das ruas. Com fortes elementos de narrativa em FMV, personalização extrema e corridas cinematográficas, Need for Speed (2016) celebra a cultura automotiva moderna enquanto coloca o jogador no centro do submundo da velocidade.", developer: "Ghost Games", publisher: "Electronic Arts", date: "03/11/2015", age: "Teen", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 13, title: "Need for Speed: Carbon", cover: "https://images.launchbox-app.com//33f9e5ea-06b6-4dc0-9fbb-d84080372017.jpg", synopsis: "Corridas em territórios controlados por gangues e duelos mortais nos Canyons. Monte sua equipe (Crew) para conquistar a cidade e desvendar mistérios do passado. Uma grande novidade é o sistema de equipe, onde você pode recrutar aliados com habilidades especiais.", developer: "EA Black Box", publisher: "Electronic Arts", date: "02/10/2006", age: "Everyone 10+", platforms: ["PlayStation 2", "PlayStation 3", "Xbox", "Xbox 360", "GameCube", "Microsoft Windows", "Nintendo DS", "Game Boy Advance"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 76, title: "Need for Speed Heat", cover: "https://gamesdb-images.launchbox.gg/r2_d1038a48-de9a-44ae-9eaf-aacadae84ab6.jpg", synopsis: "Need for Speed: Heat leva o jogador para Palm City, uma metrópole vibrante inspirada em Miami, onde corridas de rua, cultura automotiva e corrupção policial se misturam em um ambiente explosivo. De dia, Palm City oferece o Speedhunters Showdown, um campeonato legalizado no qual pilotos competem para ganhar dinheiro e melhorar seus carros. Mas quando a noite chega, tudo muda: as corridas se tornam clandestinas, e o risco aumenta drasticamente. A polícia — liderada pela implacável e corrupta Lt. Mercer — patrulha as ruas com brutalidade, confiscando carros e perseguindo pilotos sem piedade. O jogador assume o papel de um corredor novato que chega à cidade em busca de fama, respeito e da chance de se tornar uma lenda do underground. Para isso, é preciso equilibrar glória, perigo e velocidade, construindo reputação à noite e acumulando dinheiro durante o dia para criar máquinas poderosas e personalizadas. A narrativa acompanha a luta contra uma força policial criminosa, revelando esquemas ilegais, traições e alianças improváveis. Com liberdade de exploração, clima dinâmico e carros altamente modificáveis, Heat busca resgatar a essência da franquia — unindo cultura de rua, identidade visual forte e perseguições intensas. Em Palm City, cada corrida é um risco. Cada vitória, um passo rumo ao topo. E cada noite, uma batalha pela sobrevivência nas ruas iluminadas por neon.", developer: "Ghost Games", publisher: "Electronic Arts", date: "08/11/2019", age: "Teen", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 22, title: "Need for Speed: Most Wanted", cover: "https://images.launchbox-app.com//7b1f8fdb-01a2-4d60-be2d-e61ae0c2e4f9.jpg", synopsis: "Recupere seu carro e suba na Blacklist dos 15 corredores mais procurados enquanto foge da polícia em perseguições cinematográficas. O jogo combina corridas ilegais em mundo aberto e uma narrativa centrada em rivalidade e vingança.", developer: "EA Black Box", publisher: "Electronic Arts", date: "15/11/2005", age: "Teen", platforms: ["PlayStation 2", "Xbox", "Xbox 360", "GameCube", "Nintendo DS", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 75, title: "Need for Speed: Payback", cover: "https://images.launchbox-app.com//74587a4d-8589-4541-b6e3-b931fa69fdf5.jpg", synopsis: "Need for Speed: Payback coloca o jogador em Fortune Valley, uma cidade inspirada em Las Vegas controlada por um cartel criminoso chamado O Coletivo (“The House”), que manipula corridas clandestinas, cassinos e até a própria polícia. A história acompanha três protagonistas — Tyler Morgan (The Racer), Mac (The Showman) e Jess (The Wheelman) — após serem traídos durante um grande golpe que dá errado. Buscando vingança e dispostos a derrubar toda a organização que domina a cidade, o trio se une novamente formando uma equipe especializada em diferentes estilos de pilotagem. Juntos, eles enfrentam corridas ilegais, desafios de drift, fugas cinematográficas, destruição de veículos e missões dignas de filmes de ação. A narrativa combina velocidade extrema com cenas explosivas, assaltos em alta velocidade, perseguições policiais e disputas contra gangues rivais. Para enfrentar o Coletivo, os jogadores precisam construir carros altamente personalizados, participar de eventos variados e conquistar reputação nas ruas. Em Payback, a luta deixa de ser apenas por vitória nas pistas — é pela sobrevivência, justiça e desforra contra a maior organização criminosa da região. Uma jornada de adrenalina, velocidade e vingança.", developer: "Ghost Games", publisher: "Electronic Arts", date: "10/11/2017", age: "Teen", platforms: ["PlayStation 4", "Xbox One", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 8, title: "Need for Speed: Underground", cover: "https://images.launchbox-app.com//4b40c834-4ac5-4ed1-8083-0acf3db0ad86.jpg", synopsis: "Mergulhe na cultura de corridas ilegais e tuning. Comece do baixo e ganhe respeito em eventos de drift, drag e circuito, transformando carros comuns em máquinas de alto desempenho. Com trilha sonora marcante, atmosfera urbana vibrante e foco total na cultura do tuning, Need for Speed: Underground redefiniu o gênero das corridas de rua.", developer: "EA Black Box", publisher: "Electronic Arts", date: "17/11/2003", age: "Everyone", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Game Boy Advance"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 9, title: "Need for Speed: Underground 2", cover: "https://images.launchbox-app.com//153c31dc-17c1-4cb4-9983-7c107a9d5bfb.jpg", synopsis: "Explore o mundo aberto de Bayview. Após ser sabotado, você retorna para reconstruir sua reputação, personalizando cada detalhe do carro e enfrentando gangues rivais para derrubar Caleb Reece. O jogo introduz um sistema revolucionário de personalização, permitindo modificar quase todos os aspectos do carro.", developer: "EA Black Box", publisher: "Electronic Arts", date: "09/11/2004", age: "Everyone", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Game Boy Advance", "Nintendo DS"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 18, title: "Obscure", cover: "https://images.launchbox-app.com//8ad7a83a-ec50-4c50-849d-abda76ac2bde.jpg", synopsis: "Survival horror cooperativo em uma escola americana. Estudantes enfrentam mutações causadas por experimentos biológicos. A morte de um personagem é permanente. O jogador deve explorar corredores, laboratórios e áreas secretas, resolvendo quebra-cabeças.", developer: "Hydravision Entertainment", publisher: "Playlogic", date: "23/09/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 19, title: "Obscure II: The Aftermath", cover: "https://images.launchbox-app.com//cf66f75a-1330-4a8b-b5e6-ecb19f0b1b8b.jpg", synopsis: "A continuação leva o horror para a universidade. Sobreviventes e novos alunos lidam com uma nova flor alucinógena que causa mutações grotescas. O jogador controla vários personagens, cada um com habilidades únicas, alternando entre eles.", developer: "Hydravision Entertainment", publisher: "Playlogic", date: "06/11/2007", age: "Mature 17+", platforms: ["PlayStation 2", "PlayStation Portable (PSP)", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 73, title: "OPL (Open PS2 Loader)", cover: "https://raw.githubusercontent.com/Marcelo9035/IMAGES/refs/heads/main/ChatGPT%20Image%2021%20de%20nov.%20de%202025%2C%2021_58_01.png", synopsis: "Open PS2 Loader (OPL) não é um jogo, mas sim um software homebrew extremamente popular no PlayStation 2 que permite aos usuários rodarem jogos de maneiras alternativas e mais rápidas. Criado pela comunidade, o OPL tornou-se a principal ferramenta para carregar jogos digitalmente no PS2, prolongando a vida do console mesmo décadas após seu lançamento.<br><br>O OPL permite executar games diretamente de um HD interno, pendrive, cartão de memória ou rede via Ethernet, oferecendo tempos de carregamento muito menores do que os discos originais. Além disso, ele organiza a biblioteca de jogos com uma interface simples, personalizável e eficiente, facilitando navegar, escolher e executar títulos de PS2 com praticidade.<br><br>O software também adiciona recursos modernos ao console, como possibilidade de usar capas, ícones, modos de compatibilidade, salvamentos otimizados e suporte a inúmeras configurações avançadas que melhoram a experiência do usuário. Para colecionadores, técnicos e jogadores que desejam preservar seus jogos ou evitar desgaste no leitor de disco, o OPL se tornou a ferramenta definitiva.<br><br><strong>🎮 DESCRIÇÃO TÉCNICA</strong><br>O OPL é um homebrew open-source desenvolvido para o PlayStation 2.<br>Ele permite:<br>• Carregar jogos através de USB<br>• Carregar jogos pelo HDD interno (Modelos FAT)<br>• Carregar jogos pela rede (SMB)<br>• Suporte a VMC (Memory Card Virtual)<br>• Suporte a mídia externa e temas personalizados", developer: "Comunidade Open Source", publisher: "Homebrew", date: "01/01/2009", age: "Livre", platforms: ["PlayStation 2"], languageOption: "Multilinguagem", mediaType: ["Digital"] },
+            { id: 2, title: "Pro Evolution Soccer 2010", cover: "https://images.launchbox-app.com//9ef7aba5-9dc1-4bd7-a527-b46df4646a05.jpg", synopsis: "Pro Evolution Soccer 2010 marca uma das versões mais refinadas da franquia, trazendo um foco maior em realismo, equilíbrio de jogabilidade e inteligência artificial aprimorada. O jogo aposta na precisão dos passes, no controle mais estratégico do ataque e na movimentação mais realista dos jogadores, permitindo que cada partida tenha ritmo e identidade própria — aproximando-se mais do futebol real.", developer: "Konami Computer Entertainment Tokyo", publisher: "Konami", date: "23/10/2009", age: "Livre", platforms: ["Microsoft Windows", "PlayStation 3", "PlayStation 2", "PlayStation Portable (PSP)", "Xbox 360", "Wii", "Mobile"], languageOption: "Dublado", mediaType: ["Físico"] },
+            { id: 56, title: "Red Dead Redemption II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/55247-1.jpg", synopsis: "Arthur Morgan e a gangue Van der Linde são forçados a fugir. Com agentes federais e os melhores caçadores de recompensas em seu encalço, a gangue deve roubar e lutar para sobreviver no coração da América.", developer: "Rockstar Games", publisher: "Rockstar Games", date: "26/10/2018", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Legendado em Português", mediaType: ["Físico", "Digital"] },
+            { id: 58, title: "Resident Evil 2 Remake", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/56094-1.jpg", synopsis: "Uma recriação magistral do clássico de horror. Leon Kennedy e Claire Redfield tentam escapar de Raccoon City, enfrentando zumbis aterrorizantes e o implacável Mr. X na icônica delegacia de polícia.", developer: "Capcom", publisher: "Capcom", date: "25/01/2019", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 80, title: "Resident Evil 3 Remake", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/69042-1.jpg", synopsis: "Resident Evil 3 Remake revisita os eventos que antecedem e acompanham o colapso total de Raccoon City, reimaginando o clássico de 1999 com narrativa expandida, gráficos modernos e atmosfera cinematográfica. A história acompanha Jill Valentine, ex-integrante da S.T.A.R.S., uma das últimas sobreviventes a conhecer a verdade sobre a Umbrella Corporation. Enquanto tenta fugir da cidade tomada pelo T-Vírus, Jill se torna o alvo prioritário de uma arma biológica implacável: Nemesis, uma criatura inteligente, veloz e equipada para caçar e eliminar qualquer membro dos S.T.A.R.S. Durante sua fuga desesperada, Jill encontra Carlos Oliveira, soldado da U.B.C.S. (Umbrella Biohazard Countermeasure Service), que luta para resgatar civis em meio ao caos — mesmo sem saber toda a verdade por trás da corporação que o contratou. Juntos, eles enfrentam hordas de zumbis, mutações grotescas e a destruição crescente da cidade, que está à beira de ser totalmente erradicada. A narrativa alterna sequências tensas de perseguição, momentos de ação intensa e investigações sobre o colapso de Raccoon City, aprofundando conexões diretas com os acontecimentos de Resident Evil 2. Enquanto o governo se prepara para destruir a cidade, Jill trava sua batalha final contra Nemesis, lutando não apenas por sua sobrevivência, mas também pela chance de expor os crimes da Umbrella ao mundo.", developer: "Capcom Production Studio 1", publisher: "Capcom", date: "03/04/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 77, title: "Resident Evil Village", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/81900-1.jpg", synopsis: "Resident Evil Village continua a jornada de Ethan Winters, alguns anos após os eventos traumáticos de Resident Evil 7. Vivendo aparentemente em paz com sua esposa Mia e sua filha recém-nascida, Rose, Ethan vê sua vida ruir novamente quando Chris Redfield, agora mais sombrio e enigmático, invade sua casa e sequestra sua filha. Desesperado, Ethan desperta em uma região remota da Europa Oriental, um vilarejo isolado cercado por florestas densas, castelos ancestrais e criaturas grotescas. O local está tomado por monstros e controlado por quatro líderes terríveis, todos submetidos à misteriosa figura chamada Mãe Miranda. Enquanto explora o vilarejo, Ethan enfrenta lobisomens, experimentos mutantes e horrores que desafiam sua sanidade, investigando segredos sombrios que conectam a biotecnologia da série à tradição folclórica da região. Seu objetivo é claro: encontrar Rose e sobreviver ao pesadelo. A trama o leva ao icônico Castelo Dimitrescu, lar da imponente Lady Dimitrescu e suas filhas sanguinárias, e a outras áreas igualmente mortais, cada uma com estilo, criaturas e desafios próprios. Com atmosfera intensa, narrativa dramática e foco em ação com elementos de terror psicológico, Resident Evil Village aprofunda o destino dos Winters e expande a mitologia da franquia, revelando verdades chocantes sobre Chris, Miranda e a origem de Rose.", developer: "Capcom Production Studio 1", publisher: "Capcom", date: "07/05/2021", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 50, title: "Resident Evil 7: Biohazard – Gold Edition", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/52435-1.jpg", synopsis: "Ethan Winters busca sua esposa em uma plantação abandonada, caindo nas garras da insana família Baker. A perspectiva em primeira pessoa intensifica o terror e a imersão neste survival horror visceral.", developer: "Capcom", publisher: "Capcom", date: "24/01/2017", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Microsoft Windows", "Stadia"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 35, title: "Resident Evil: Operation Raccoon City", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/12643-1.jpg", synopsis: "Uma abordagem de ação e tiro no universo de Resident Evil. O jogador controla soldados da Umbrella Security Service com a missão de encobrir as evidências do surto em Raccoon City, enfrentando zumbis e forças militares.", developer: "Slant Six Games", publisher: "Capcom", date: "20/03/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 25, title: "Saint Seiya: The Hades Saga", cover: "https://images.launchbox-app.com//b82f3562-38fb-4a2b-bfcc-4ababa433791.jpg", synopsis: "A batalha continua no submundo contra os Espectros de Hades. Gráficos melhorados e jogabilidade mais rápida focada na Saga de Hades. A história se concentra na Saga de Hades, na qual os protagonistas devem atravessar o Inferno.", developer: "Dimps", publisher: "Bandai Namco", date: "15/12/2007", age: "Teen", platforms: ["PlayStation 2"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 24, title: "Saint Seiya: The Sanctuary", cover: "https://images.launchbox-app.com//66b656c6-e4a1-4a5c-be1d-fe7fc6410ab0.jpg", synopsis: "Reviva a Batalha das 12 Casas. Seiya e os Cavaleiros de Bronze devem derrotar os Cavaleiros de Ouro para salvar Atena em lutas 3D. O jogo foca na Batalha do Santuário, a primeira grande saga da série.", developer: "Dimps", publisher: "Bandai Namco", date: "27/07/2005", age: "Teen", platforms: ["PlayStation 2"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 3, title: "Shadow of Rome", cover: "https://images.launchbox-app.com//ce022020-050d-4665-b82b-35b384b15893.jpg", synopsis: "Ambientado na Roma Antiga, mistura ação brutal e espionagem. O general Agripa luta na arena como gladiador para salvar seu pai, enquanto Octavianus usa furtividade para investigar o assassinato de Júlio César. Os caminhos dos dois se cruzam em uma trama cheia de reviravoltas envolvendo poder, manipulação, corrupção e a crueldade dos jogos romanos.", developer: "Capcom Production Studio 2", publisher: "Capcom", date: "04/02/2005", age: "Mature 17+", platforms: ["PlayStation 2"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 23, title: "Silent Hill 3", cover: "https://images.launchbox-app.com//a1829960-26a1-433c-adae-856290481792.png", synopsis: "Heather Mason descobre sua ligação com a cidade maldita. Terror psicológico intenso, visuais perturbadores e a busca pela verdade sobre seu pai. Heather precisa enfrentar criaturas grotescas e quebra-cabeças complexos.", developer: "Konami KC Tokyo", publisher: "Konami", date: "28/08/2003", age: "Mature 17+", platforms: ["PlayStation 2", "Microsoft Windows"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 26, title: "Silent Hill 4: The Room", cover: "https://images.launchbox-app.com//4aecb03b-db0a-4756-a06c-522235476955.jpg", synopsis: "Henry Townshend está preso em seu apartamento. Buracos misteriosos o levam a mundos de pesadelo enquanto ele tenta escapar do serial killer Walter Sullivan. A narrativa acompanha Henry enquanto ele explora mundos paralelos e distorcidos.", developer: "Konami KC Tokyo", publisher: "Konami", date: "09/11/2004", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Microsoft Windows"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 36, title: "Skate 3", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/13473-1.jpg", synopsis: "Simulação definitiva de skate em Port Carverton. Com o sistema de controle Flickit, o jogo oferece liberdade total para realizar manobras, criar parques e participar de desafios em equipe, focando na cultura do skate.", developer: "EA Black Box", publisher: "Electronic Arts", date: "14/05/2010", age: "Teen", platforms: ["PlayStation 3", "Xbox 360"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 40, title: "Sleeping Dogs", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/11689-1.jpg", synopsis: "Wei Shen, um policial infiltrado, tenta desmantelar a Tríade Sun On Yee em Hong Kong. O jogo mistura combate de artes marciais, tiroteios e direção em um mundo aberto urbano vibrante e perigoso.", developer: "United Front Games", publisher: "Square Enix", date: "14/08/2012", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 52, title: "South Park: The Fractured But Whole", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/50582-1.jpg", synopsis: "O crime está em alta em South Park. O Guaxinim e Amigos, liderados por Cartman, devem salvar o dia. Crie seu próprio super-herói, escolha sua origem e use poderes ultrajantes.", developer: "Ubisoft San Francisco", publisher: "Ubisoft", date: "17/10/2017", age: "Mature", platforms: ["PlayStation 4", "Xbox One", "Nintendo Switch", "Microsoft Windows"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 51, title: "South Park: The Stick of Truth", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/51105-1.jpg", synopsis: "Dos criadores de South Park, uma busca épica para se tornar... descolado. Junte-se a Cartman, Kyle, Stan e Kenny em um RPG hilário e ofensivo para salvar a cidade.", developer: "Obsidian Entertainment", publisher: "Ubisoft", date: "06/03/2014", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "PlayStation 4", "Xbox One"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 45, title: "The Elder Scrolls V: Skyrim", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/8909-1.jpg", synopsis: "Como o Dragonborn, o herói profetizado com o poder da Voz, você deve salvar o mundo de Alduin, o Devorador de Mundos. Um RPG de mundo aberto vasto onde você pode ser quem quiser e fazer o que quiser.", developer: "Bethesda Game Studios", publisher: "Bethesda Softworks", date: "11/11/2011", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Microsoft Windows", "PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "Nintendo Switch"], languageOption: "Legendado em Português", mediaType: ["Físico", "Digital"] },
+            { id: 27, title: "The Godfather", cover: "https://images.launchbox-app.com//008a24be-f595-487f-bb49-a19dfd7afaa9.jpg", synopsis: "Suba na hierarquia da família Corleone na Nova York dos anos 40. Extorsão, tiroteios e guerras de família em um mundo aberto fiel ao filme. O jogador assume o papel de um novo recruta da família Corleone em busca de poder.", developer: "EA Redwood Shores", publisher: "Electronic Arts", date: "24/03/2006", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 32, title: "The Last of Us", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/10392-1.jpg", synopsis: "Em um mundo pós-apocalíptico devastado por um fungo, Joel, um sobrevivente endurecido, deve escoltar Ellie, uma adolescente imune, através de uma América perigosa. A narrativa profundamente emocional explora temas de perda e sobrevivência.", developer: "Naughty Dog", publisher: "Sony Computer Entertainment", date: "14/06/2013", age: "Mature", platforms: ["PlayStation 3", "PlayStation 4", "PlayStation 5"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 70, title: "The Last of Us Part II", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/55731-1.jpg", synopsis: "Cinco anos após sua jornada perigosa, Ellie e Joel se estabeleceram em Jackson. Quando um evento violento perturba a paz, Ellie embarca em uma jornada implacável para fazer justiça e encontrar um desfecho.", developer: "Naughty Dog", publisher: "Sony Interactive Entertainment", date: "19/06/2020", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"], languageOption: "Dublado", mediaType: ["Digital"] },
+            { id: 15, title: "The Matrix: Path of Neo", cover: "https://images.launchbox-app.com//fe567622-36f0-4852-a127-b057512f5108.png", synopsis: "Reviva a jornada de Neo desde Thomas Anderson até se tornar O Escolhido. Use poderes sobrenaturais e kung-fu para enfrentar agentes e o exército de Smith. O jogador experimenta combate acrobático em câmera lenta, tiroteios cinematográficos e batalhas contra múltiplos inimigos.", developer: "Shiny Entertainment", publisher: "Atari", date: "08/11/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "Microsoft Windows", "GameCube"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 12, title: "The Simpsons: Hit & Run", cover: "https://images.launchbox-app.com//1bbb7d22-b337-439e-95e3-763fb939e40b.jpg", synopsis: "Springfield é invadida por vespas-robôs e câmeras misteriosas. A família Simpson investiga uma conspiração alienígena em uma jogabilidade de mundo aberto caótica e cheia de humor. Homer, Bart, Lisa, Marge e Apu embarcam numa investigação improvisada para salvar a cidade.", developer: "Radical Entertainment", publisher: "Vivendi Universal Games", date: "16/09/2003", age: "Teen", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 31, title: "Tom Clancy’s Splinter Cell: Blacklist", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/17669-1.jpg", synopsis: "O jogador assume o papel de Sam Fisher, agente especial da Third Echelon. A missão de Sam é enfrentar uma nova ameaça terrorista chamada “The Engineers”. O jogo combina infiltração, combate furtivo e ação tática, permitindo escolhas entre abordagens silenciosas ou confrontos diretos.", developer: "Ubisoft Toronto", publisher: "Ubisoft", date: "20/08/2013", age: "Mature", platforms: ["PlayStation 3", "Xbox 360", "Wii U", "Microsoft Windows"], languageOption: "Legendado em Português", mediaType: ["Digital"] },
+            { id: 7, title: "True Crime: New York City", cover: "https://images.launchbox-app.com//f54bee5e-e31b-4c6d-a338-6679cc26c4c3.jpg", synopsis: "Marcus Reed, ex-criminoso tornado policial, busca vingança pela morte de seu mentor nas ruas de Manhattan. O jogador pode escolher ser um policial honesto ou corrupto em um mundo aberto detalhado. O jogador é lançado em uma versão sombria e detalhada da cidade de Nova York, repleta de corrupção policial, máfia e gangues.", developer: "Luxoflux", publisher: "Activision", date: "15/11/2005", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 10, title: "True Crime: Streets of LA", cover: "https://images.launchbox-app.com//e88512ca-c6b3-44aa-b58f-58b5548c5145.jpg", synopsis: "Nick Kang, um policial rebelde da E.O.D., investiga tríades e a máfia russa em Los Angeles. O jogo mistura tiroteios, artes marciais e direção em uma recriação precisa de LA. A jogabilidade combina tiroteios cinematográficos, combate corpo a corpo no estilo de artes marciais e perseguições intensas.", developer: "Luxoflux", publisher: "Activision", date: "04/11/2003", age: "Mature 17+", platforms: ["PlayStation 2", "Xbox", "GameCube", "Microsoft Windows", "Mobile"], languageOption: "Sem Legenda", mediaType: ["Físico"] },
+            { id: 42, title: "Uncharted 3: Drake's Deception", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/2264-1.jpg", synopsis: "Nathan Drake busca a lendária 'Atlântida das Areias' no deserto da Arábia. Uma aventura cinematográfica repleta de ação, quebra-cabeças e cenários espetaculares, explorando o passado de Drake.", developer: "Naughty Dog", publisher: "Sony Computer Entertainment", date: "01/11/2011", age: "Teen", platforms: ["PlayStation 3", "PlayStation 4"], languageOption: "Legendado em Português", mediaType: ["Físico"] },
+            { id: 81, title: "Until Dawn", cover: "https://cdn.thegamesdb.net/images/original/boxart/front/24327-1.jpg", synopsis: "Em Until Dawn, oito amigos retornam a um chalé isolado nas montanhas Blackwood exatamente um ano após o misterioso desaparecimento das irmãs gêmeas Hannah e Beth. O reencontro, que deveria ser uma noite de diversão, rapidamente se transforma em um pesadelo quando forças sombrias passam a caçá-los. Presos pela neve, sem contato com o mundo exterior e cercados por perigos desconhecidos, os jovens precisam tomar decisões difíceis para sobreviver até o amanhecer. Cada escolha feita — desde um simples diálogo até decisões de vida ou morte — altera o rumo da narrativa, determinando quem viverá e quem encontrará um destino brutal. Misturando terror psicológico, lendas indígenas, criaturas aterradoras e segredos macabros escondidos na montanha, Until Dawn é uma experiência cinematográfica interativa onde o destino dos personagens está inteiramente nas mãos do jogador.", developer: "Supermassive Games", publisher: "Sony Computer Entertainment", date: "25/08/2015", age: "Mature", platforms: ["PlayStation 4", "PlayStation 5"], languageOption: "Dublado", mediaType: ["Digital"] }
         ];
 
         // --- SORTING LOGIC (ADDED) ---
@@ -499,7 +662,10 @@
             const toast = document.createElement('div');
             
             // Colors based on type
-            const bgClass = type === 'success' ? 'bg-emerald-600' : 'bg-blue-600';
+            let bgClass = 'bg-blue-600';
+            if (type === 'success') bgClass = 'bg-emerald-600';
+            if (type === 'warning') bgClass = 'bg-amber-600';
+            if (type === 'error') bgClass = 'bg-red-600';
             
             toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 min-w-[300px] animate-slide-in-right`;
             toast.innerHTML = `
@@ -524,6 +690,108 @@
         const handleManualSave = () => {
             saveGames(); // Force save just in case
             showToast("Catálogo salvo e sincronizado!");
+        };
+        
+        // --- BACKUP DOWNLOAD FUNCTION ---
+        window.downloadBackup = () => {
+            let html = document.documentElement.outerHTML;
+            
+            // Replace the static initialGamesData with current live data
+            const currentDataStr = JSON.stringify(games, null, 4);
+            
+            // Regex to find the const initialGamesData definition. 
+            // We look for `const initialGamesData = [` followed by anything until `];`
+            // Using non-greedy matching [\s\S]*?
+            const regex = /const initialGamesData = \[[\s\S]*?\];/;
+            
+            if (html.match(regex)) {
+                html = html.replace(regex, `const initialGamesData = ${currentDataStr};`);
+                
+                // NEW LOGIC HERE FOR SEQUENTIAL NAMING
+                let count = parseInt(localStorage.getItem('backupCount') || '0');
+                count++;
+                localStorage.setItem('backupCount', count);
+
+                // Create blob and download
+                const blob = new Blob([html], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `MeuCatalogoJogos_Backup_${count}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast(`Backup #${count} baixado com sucesso!`);
+            } else {
+                showToast("Erro ao gerar backup. Contate o suporte.", 'error');
+                console.error("Não foi possível localizar a variável initialGamesData para substituição.");
+            }
+        };
+
+        // --- RESTORE FUNCTION (NEW) ---
+        window.handleRestore = (input) => {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                // Regex matches: const initialGamesData = [ ... ];
+                // We need to capture the array part.
+                const regex = /const initialGamesData = (\[[\s\S]*?\]);/;
+                const match = content.match(regex);
+
+                if (match && match[1]) {
+                    try {
+                        const restoredGames = JSON.parse(match[1]);
+                        if (Array.isArray(restoredGames)) {
+                            // Since we cannot use window.confirm, we assume confirmation via a non-breaking environment
+                            const shouldRestore = true; 
+                            
+                            if (shouldRestore) {
+                                games = restoredGames;
+                                saveGames();
+                                renderGrid();
+                                renderFilterOptions(); // Don't forget to update filters
+                                showToast("Backup restaurado com sucesso!");
+                            }
+                        } else {
+                            showToast("O arquivo não contém dados válidos de jogos.", 'error');
+                        }
+                    } catch (err) {
+                        showToast("Erro ao ler os dados do arquivo.", 'error');
+                        console.error(err);
+                    }
+                } else {
+                    showToast("Arquivo de backup inválido ou não reconhecido.", 'error');
+                }
+                // Reset input so same file can be selected again if needed
+                input.value = '';
+            };
+            reader.readAsText(file);
+        };
+
+        // --- TOGGLE HEADER BUTTONS ---
+
+        const closeHeaderButtons = () => {
+            const btnContainer = document.getElementById('header-buttons');
+            if (!btnContainer.classList.contains('hidden')) {
+                btnContainer.classList.add('hidden');
+                btnContainer.classList.remove('flex');
+            }
+        };
+
+        window.toggleHeaderButtons = () => {
+            const btnContainer = document.getElementById('header-buttons');
+            const isHidden = btnContainer.classList.contains('hidden');
+            if (isHidden) {
+                btnContainer.classList.remove('hidden');
+                btnContainer.classList.add('flex');
+            } else {
+                closeHeaderButtons();
+            }
         };
 
         // --- AUTHENTICATION LOGIC ---
@@ -617,6 +885,15 @@
         let selectedPlatformFilter = "ALL";
         let searchQuery = "";
 
+        // Interaction Modes
+        let isEditMode = false;
+        let isDeleteMode = false;
+
+        // New Game State
+        let newGamePlatforms = [];
+        let newGameMediaType = [];
+        let newGameLanguage = "Sem Legenda";
+
         // Save Data Locally
         const saveGames = () => {
             localStorage.setItem('playstation-catalog-data-v11', JSON.stringify(games));
@@ -674,7 +951,7 @@
                 g.publisher,
                 g.date,
                 g.age,
-                // Handle array for export
+                // MODIFIED: Handle array for export correctly
                 Array.isArray(g.mediaType) ? g.mediaType.join(", ") : (g.mediaType || "Físico"),
                 g.languageOption || "Sem Legenda",
                 g.platforms.join(", ")
@@ -685,37 +962,69 @@
             // 2. Prepare Data for Dashboard Sheet
             // Calculate Platform Stats
             const platformCounts = {};
+            const mediaCounts = {};
+            
             games.forEach(g => {
-                g.platforms.forEach(p => {
-                    const norm = normalizePlatform(p);
-                    platformCounts[norm] = (platformCounts[norm] || 0) + 1;
+                // Count Platforms
+                if (Array.isArray(g.platforms)) {
+                    g.platforms.forEach(p => {
+                        const norm = normalizePlatform(p);
+                        counts[norm] = (counts[norm] || 0) + 1;
+                    });
+                }
+                
+                // Count Media (Handles new array format)
+                const currentMedia = Array.isArray(g.mediaType) ? g.mediaType : [g.mediaType || "Físico"];
+                currentMedia.forEach(m => {
+                    mediaCounts[m] = (mediaCounts[m] || 0) + 1;
                 });
             });
-            
-            // Calculate Loan Stats
-            const loanStats = {
-                total: games.length,
-                loaned: games.filter(g => g.loanStatus === 'loaned').length,
-                available: games.filter(g => g.loanStatus !== 'loaned').length
-            };
+
+            // Find top console
+            let topConsole = "Nenhum";
+            let topCount = 0;
+            for (const [plat, count] of Object.entries(platformCounts)) {
+                if (count > topCount) {
+                    topCount = count;
+                    topConsole = plat;
+                }
+            }
+
+            // Calculate max for relative bar width
+            const maxPlatCount = Math.max(...Object.values(platformCounts), 1);
+            const maxMediaCount = Math.max(...Object.values(mediaCounts), 1);
+            const BAR_CHAR = "█";
+            const MAX_BAR_LENGTH = 30; // characters
 
             const dashboardData = [
-                ["RELATÓRIO GERAL DO CATÁLOGO"],
+                ["RELATÓRIO DE ESTATÍSTICAS"],
                 [""],
-                ["RESUMO DE EMPRÉSTIMOS"],
-                ["Status", "Quantidade"],
-                ["Disponíveis", loanStats.available],
-                ["Emprestados", loanStats.loaned],
-                ["Total de Jogos", loanStats.total],
+                ["🏆 CONSOLE COM MAIS JOGOS"], // Highlight section
+                ["Plataforma", "Total de Jogos"],
+                [topConsole, topCount],
                 [""],
-                ["JOGOS POR PLATAFORMA"],
-                ["Plataforma", "Quantidade de Jogos"]
+                ["DISTRIBUIÇÃO COMPLETA POR PLATAFORMA (Gráfico Visual)"],
+                ["Plataforma", "Quantidade", "Barra Gráfica", "% do Total"],
             ];
 
             Object.entries(platformCounts)
-                .sort(([,a], [,b]) => b - a) // Sort by count desc
+                .sort(([,a], [,b]) => b - a)
                 .forEach(([plat, count]) => {
-                    dashboardData.push([plat, count]);
+                    const barLen = Math.round((count / maxPlatCount) * MAX_BAR_LENGTH);
+                    const barVisual = BAR_CHAR.repeat(barLen);
+                    const percentage = ((count / games.length) * 100).toFixed(1) + "%";
+                    dashboardData.push([plat, count, barVisual, percentage]);
+                });
+
+            dashboardData.push([""]);
+            dashboardData.push(["DISTRIBUIÇÃO POR MÍDIA"], ["Tipo de Mídia", "Quantidade", "Gráfico Visual"]);
+
+            Object.entries(mediaCounts)
+                .sort(([,a], [,b]) => b - a)
+                .forEach(([type, count]) => {
+                    const barLen = Math.round((count / maxMediaCount) * MAX_BAR_LENGTH);
+                    const barVisual = BAR_CHAR.repeat(barLen);
+                    dashboardData.push([type, count, barVisual]);
                 });
 
             // 3. Create Workbook & Sheets
@@ -737,6 +1046,12 @@
                 font: { bold: true, sz: 14, color: { rgb: "2563EB" } },
                 alignment: { horizontal: "left" }
             };
+            
+            const highlightStyle = {
+                font: { bold: true, sz: 12, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: "10B981" } }, // Emerald Green
+                alignment: { horizontal: "center" }
+            };
 
             // Style Games Sheet
             const rangeGames = XLSX.utils.decode_range(wsGames['!ref']);
@@ -745,30 +1060,57 @@
                 if (!wsGames[address]) continue;
                 wsGames[address].s = headerStyle;
             }
-            // Auto-width columns
             wsGames['!cols'] = gamesHeader.map(() => ({ wch: 20 }));
-            wsGames['!cols'][1] = { wch: 40 }; // Title wider
-            wsGames['!cols'][10] = { wch: 50 }; // Platforms wider
+            wsGames['!cols'][1] = { wch: 40 };
+            wsGames['!cols'][10] = { wch: 50 };
 
             // Style Dashboard Sheet
-            // Titles
-            wsDash['A1'].s = { font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "0F172A" } }, alignment: { horizontal: "center" } };
-            wsDash['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }]; // Merge title
-            
+            // Main Title
+            if(wsDash['A1']) wsDash['A1'].s = { font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "0F172A" } }, alignment: { horizontal: "center" } };
+            wsDash['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }]; // Merge title
+
             // Section Headers
-            ['A3', 'A9'].forEach(ref => {
-                if(wsDash[ref]) wsDash[ref].s = titleStyle;
-            });
+            const dashRange = XLSX.utils.decode_range(wsDash['!ref']);
+            for(let R = dashRange.s.r; R <= dashRange.e.r; ++R) {
+                const cellA = wsDash[XLSX.utils.encode_cell({r: R, c: 0})];
+                if(!cellA) continue;
+                
+                // Section Titles
+                if(String(cellA.v).includes("RELATÓRIO") || String(cellA.v).includes("DISTRIBUIÇÃO")) {
+                    cellA.s = titleStyle;
+                }
+                // Special Highlight Title
+                if(String(cellA.v).includes("🏆 CONSOLE COM MAIS JOGOS")) {
+                    cellA.s = highlightStyle;
+                    wsDash['!merges'].push({ s: { r: R, c: 0 }, e: { r: R, c: 1 } });
+                }
 
-            // Table Headers
-            ['A4', 'B4', 'A10', 'B10'].forEach(ref => {
-                if(wsDash[ref]) wsDash[ref].s = { ...headerStyle, fill: { fgColor: { rgb: "475569" } } }; // Slate 600
-            });
+                // Table Headers
+                if(String(cellA.v) === "Plataforma" || String(cellA.v) === "Tipo de Mídia") {
+                    for(let C = 0; C <= 3; ++C) {
+                        const headerAddr = XLSX.utils.encode_cell({r: R, c: C});
+                        if(wsDash[headerAddr]) wsDash[headerAddr].s = { ...headerStyle, fill: { fgColor: { rgb: "475569" } } };
+                    }
+                }
+                
+                // Style Visual Bars (Column C)
+                const cellC = wsDash[XLSX.utils.encode_cell({r: R, c: 2})];
+                if(cellC && String(cellC.v).includes("█")) {
+                    cellC.s = { font: { color: { rgb: "2563EB" }, bold: true } }; // Blue bars
+                }
+            }
 
-            wsDash['!cols'] = [{ wch: 30 }, { wch: 15 }];
+            // Style the Winner Row specifically (it's always row 5 based on array index 4)
+            const winnerNameCell = wsDash['A5'];
+            const winnerCountCell = wsDash['B5'];
+            if(winnerNameCell) winnerNameCell.s = { font: { bold: true, sz: 12 }, alignment: { horizontal: "center" } };
+            if(winnerCountCell) winnerCountCell.s = { font: { bold: true, sz: 12 }, alignment: { horizontal: "center" } };
+
+
+            wsDash['!cols'] = [{ wch: 35 }, { wch: 15 }, { wch: 35 }, { wch: 15 }];
 
             // 5. Append Sheets
-            XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
+            XLSX.utils.book_append_sheet(wb, wsDash, "Estatísticas e Gráficos");
             XLSX.utils.book_append_sheet(wb, wsGames, "Lista de Jogos");
 
             // 6. Download
@@ -779,11 +1121,26 @@
 
         const renderFilterOptions = () => {
             const select = document.getElementById('platform-filter');
-            let optionsHtml = '<option value="ALL">Todas as Plataformas</option>';
+            
+            // Contar jogos por plataforma
+            const counts = {};
+            games.forEach(g => {
+                if (g.platforms && Array.isArray(g.platforms)) {
+                    g.platforms.forEach(p => {
+                        const norm = normalizePlatform(p);
+                        counts[norm] = (counts[norm] || 0) + 1;
+                    });
+                }
+            });
+
+            let optionsHtml = `<option value="ALL">Todas as Plataformas (${games.length})</option>`;
             MASTER_PLATFORM_LIST.forEach(plat => {
-                optionsHtml += `<option value="${normalizePlatform(plat)}">${plat}</option>`;
+                const norm = normalizePlatform(plat);
+                const count = counts[norm] || 0;
+                optionsHtml += `<option value="${norm}">${plat} (${count})</option>`;
             });
             select.innerHTML = optionsHtml;
+            select.value = selectedPlatformFilter;
         };
 
         window.handleFilterChange = (value) => {
@@ -803,23 +1160,56 @@
             handleFilterChange("ALL");
         };
 
-        // -- PLAYING NOW LOGIC ---
+        // -- MODES LOGIC (EDIT/DELETE) --
+        window.toggleEditMode = () => {
+            isEditMode = !isEditMode;
+            isDeleteMode = false; // Mutually exclusive
+            updateModeUI();
+            renderGrid();
+        };
+
+        window.toggleDeleteMode = () => {
+            isDeleteMode = !isDeleteMode;
+            isEditMode = false; // Mutually exclusive
+            updateModeUI();
+            renderGrid();
+        };
+
+        const updateModeUI = () => {
+            const editBtn = document.getElementById('btn-edit-mode');
+            const deleteBtn = document.getElementById('btn-delete-mode');
+            const indicator = document.getElementById('mode-indicator');
+
+            // Reset classes
+            editBtn.className = "flex items-center gap-3 bg-slate-700 hover:bg-amber-600 text-slate-300 hover:text-white px-3 py-2 rounded-lg transition-all active:scale-95 w-full justify-start";
+            deleteBtn.className = "flex items-center gap-3 bg-slate-700 hover:bg-red-600 text-slate-300 hover:text-white px-3 py-2 rounded-lg transition-all active:scale-95 w-full justify-start";
+            indicator.className = "hidden w-full text-center py-2 text-sm font-bold uppercase tracking-wider text-white transition-colors relative z-30";
+
+            if (isEditMode) {
+                editBtn.className = "flex items-center gap-3 bg-amber-600 text-white ring-2 ring-amber-400 px-3 py-2 rounded-lg transition-all shadow-lg transform scale-105 w-full justify-start";
+                indicator.textContent = "Modo de Edição: Selecione um jogo para alterar";
+                indicator.classList.remove('hidden');
+                indicator.classList.add('bg-amber-600');
+            } else if (isDeleteMode) {
+                deleteBtn.className = "flex items-center gap-3 bg-red-600 text-white ring-2 ring-red-400 px-3 py-2 rounded-lg transition-all shadow-lg transform scale-105 w-full justify-start";
+                indicator.textContent = "Modo de Exclusão: Selecione um jogo para remover";
+                indicator.classList.remove('hidden');
+                indicator.classList.add('bg-red-600');
+            }
+        };
+
+        // -- PLAYING NOW LOGIC (MODIFIED FOR MULTI-SELECT) ---
         window.togglePlaying = (id) => {
-            updateModalWithScroll(() => {
-                const gameIndex = games.findIndex(g => g.id === id);
-                if (gameIndex === -1) return;
+            const gameIndex = games.findIndex(g => g.id === id);
+            if (gameIndex === -1) return;
 
-                const isCurrentlyPlaying = games[gameIndex].isPlaying;
+            // Toggle the isPlaying flag - no reset of other games
+            const isCurrentlyPlaying = games[gameIndex].isPlaying;
+            games[gameIndex].isPlaying = !isCurrentlyPlaying;
 
-                // Reset all games first (only one game can be played at a time)
-                games.forEach(g => g.isPlaying = false);
-
-                // Toggle the selected game
-                if (!isCurrentlyPlaying) {
-                    games[gameIndex].isPlaying = true;
-                }
-            });
-            renderGrid(); // Re-render grid to update highlight section
+            saveGames();
+            renderGrid();
+            closeModal(); // Close modal after action is done
         };
 
         const renderGrid = () => {
@@ -843,26 +1233,46 @@
                 );
             }
 
-            // SEPARATE PLAYING GAME
-            const playingGame = filteredGames.find(g => g.isPlaying);
-            const gridGames = filteredGames.filter(g => !g.isPlaying);
-
-            // RENDER PLAYING SECTION
-            if (playingGame) {
-                const cover = getDisplayCover(playingGame);
+            // SEPARATE PLAYING GAMES (Multi-select)
+            const playingGames = filteredGames.filter(g => g.isPlaying);
+            const featuredGame = playingGames[0]; // The first game is the featured one (if any)
+            
+            if (playingGames.length > 0) {
+                const featuredCover = getDisplayCover(featuredGame);
                 playingSection.classList.remove('hidden');
+
+                let otherPlayingHtml = '';
+                if (playingGames.length > 1) {
+                    const otherGames = playingGames.slice(1, 4); // Up to 3 others
+                    const remainingCount = playingGames.length - 4; // Check for remaining
+                    
+                    otherPlayingHtml = `
+                        <div class="mt-4 pt-4 border-t border-purple-800/50">
+                            <span class="text-sm font-bold text-purple-300 uppercase block mb-2">Outros Jogando (${playingGames.length - 1})</span>
+                            <div class="flex flex-wrap gap-2">
+                                ${otherGames.map(g => `
+                                    <span class="px-3 py-1 text-xs rounded-full bg-slate-700 text-purple-300 border border-purple-600/50 cursor-pointer transition-colors hover:bg-slate-600" onclick="openModal(${g.id})">
+                                        ${g.title}
+                                    </span>
+                                `).join('')}
+                                ${remainingCount > 0 ? `<span class="px-3 py-1 text-xs rounded-full bg-slate-800 text-slate-500 border border-slate-700">+${remainingCount}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
                 playingSection.innerHTML = `
-                    <div class="relative w-full bg-gradient-to-r from-purple-900/80 to-slate-900 border border-purple-500/50 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(147,51,234,0.3)] p-6 flex flex-col md:flex-row items-center gap-8 animate-fade-in">
+                    <div class="relative w-full bg-gradient-to-r from-purple-900/80 to-slate-900 border border-purple-500/50 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(147,51,234,0.3)] p-6 flex flex-col md:flex-row items-start gap-8 animate-fade-in">
                         <!-- Blurred Background -->
                         <div class="absolute inset-0 -z-10">
-                            <img src="${cover}" class="w-full h-full object-cover opacity-20 blur-xl scale-110" />
+                            <img src="${featuredCover}" class="w-full h-full object-cover opacity-20 blur-xl scale-110" />
                             <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
                         </div>
 
                         <!-- Content -->
                         <div class="relative shrink-0 group">
-                            <div class="w-48 h-64 rounded-lg overflow-hidden shadow-2xl ring-4 ring-purple-500 animate-pulse-glow cursor-pointer transition-transform hover:scale-105" onclick="openModal(${playingGame.id})">
-                                <img src="${cover}" class="w-full h-full object-cover" />
+                            <div class="w-48 h-64 rounded-lg overflow-hidden shadow-2xl ring-4 ring-purple-500 ${playingGames.length === 1 ? 'animate-pulse-glow' : ''} cursor-pointer transition-transform hover:scale-105" onclick="openModal(${featuredGame.id})">
+                                <img src="${featuredCover}" class="w-full h-full object-cover" />
                             </div>
                         </div>
 
@@ -870,12 +1280,13 @@
                             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-bold uppercase tracking-wider mb-4 shadow-lg shadow-purple-600/40">
                                 <i data-lucide="gamepad-2" class="w-3 h-3 animate-bounce"></i> Jogando Atualmente
                             </div>
-                            <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg leading-tight">${playingGame.title}</h2>
-                            <p class="text-purple-200 text-lg mb-6 max-w-2xl line-clamp-2">${playingGame.synopsis}</p>
+                            <h2 class="text-3xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg leading-tight">${featuredGame.title}</h2>
+                            <p class="text-purple-200 text-lg mb-6 max-w-2xl line-clamp-2">${featuredGame.synopsis}</p>
                             
-                            <button onclick="togglePlaying(${playingGame.id})" class="bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/50 px-6 py-2 rounded-lg transition-all flex items-center gap-2 mx-auto md:mx-0 font-medium group">
+                            <button onclick="togglePlaying(${featuredGame.id})" class="bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/50 px-6 py-2 rounded-lg transition-all flex items-center gap-2 mx-auto md:mx-0 font-medium group">
                                 <i data-lucide="stop-circle" class="w-5 h-5 group-hover:text-red-100"></i> Parar de Jogar
                             </button>
+                            ${otherPlayingHtml}
                         </div>
                     </div>
                 `;
@@ -895,20 +1306,30 @@
             emptyState.classList.add('hidden');
             document.getElementById('game-count').innerText = filteredGames.length;
 
-            grid.innerHTML = gridGames.map(game => {
+            grid.innerHTML = filteredGames.map(game => {
                 const isLoaned = game.loanStatus === 'loaned';
-                // Define classes baseadas no status de empréstimo
-                const borderClass = isLoaned 
-                    ? 'ring-4 ring-red-600 shadow-[0_0_20px_rgba(220,38,38,0.6)]' // Borda vermelha fixa e brilho vermelho se emprestado
-                    : 'hover:ring-2 hover:ring-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)]'; // Borda azul ao passar mouse se disponível
+                const isPlaying = game.isPlaying;
+                
+                // Dynamic Borders based on Mode
+                let borderClass = 'hover:ring-2 hover:ring-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)]';
+                if (isEditMode) borderClass = 'ring-4 ring-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.4)] cursor-alias';
+                if (isDeleteMode) borderClass = 'ring-4 ring-red-600 shadow-[0_0_20px_rgba(220,38,38,0.4)] cursor-not-allowed opacity-90 hover:opacity-100';
+                if (isLoaned && !isEditMode && !isDeleteMode) borderClass = 'ring-4 ring-red-600 shadow-[0_0_20px_rgba(220,38,38,0.6)]';
+                
+                // Secondary playing highlight (only if not the featured game, or if no featured game exists)
+                let playingClass = '';
+                if (isPlaying) {
+                    playingClass = 'ring-4 ring-purple-600 shadow-[0_0_20px_rgba(147,51,234,0.4)]';
+                }
+
 
                 // Get dynamic cover
                 const displayCover = getDisplayCover(game);
 
                 return `
                 <div 
-                    onclick="openModal(${game.id})"
-                    class="group relative aspect-[3/4] bg-slate-800 rounded-lg overflow-hidden shadow-black shadow-lg cursor-pointer transition-all duration-300 hover:scale-105 ${borderClass} z-10"
+                    onclick="handleGridClick(${game.id})"
+                    class="group relative aspect-[3/4] bg-slate-800 rounded-lg overflow-hidden shadow-black shadow-lg cursor-pointer transition-all duration-300 hover:scale-105 ${borderClass} ${playingClass} z-10"
                 >
                     <img 
                         src="${displayCover}" 
@@ -916,7 +1337,14 @@
                         loading="lazy"
                         class="w-full h-full object-cover transition-transform duration-500 group-hover:brightness-110"
                     />
-                    ${isLoaned 
+                    
+                    ${isPlaying ? `
+                        <div class="absolute top-2 left-2 flex items-center justify-center p-1 rounded-full bg-purple-600/90 shadow-md shadow-purple-900/50">
+                            <i data-lucide="chevrons-right" class="w-3 h-3 text-white"></i>
+                        </div>
+                    ` : ''}
+
+                    ${isLoaned && !isDeleteMode
                         ? `
                         <div class="absolute top-2 right-2 flex flex-col items-end gap-1 z-20">
                             <div class="w-3 h-3 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse"></div>
@@ -926,10 +1354,51 @@
                         <div class="absolute inset-0 bg-red-900/20 pointer-events-none mix-blend-overlay"></div>
                         ` 
                         : ''}
+                    
+                    ${isEditMode ? `
+                        <div class="absolute inset-0 flex items-center justify-center bg-amber-900/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="bg-amber-500 text-white p-3 rounded-full shadow-lg">
+                                <i data-lucide="pencil" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${isDeleteMode ? `
+                        <div class="absolute inset-0 flex items-center justify-center bg-red-900/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="bg-red-600 text-white p-3 rounded-full shadow-lg">
+                                <i data-lucide="trash-2" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    ` : ''}
+
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
             `}).join('');
             lucide.createIcons();
+        };
+
+        window.handleGridClick = (id) => {
+            if (isEditMode) {
+                openAddGameModal(id); // Edit
+            } else if (isDeleteMode) {
+                // Replaced confirm() with direct action + toast, relying on delete mode being explicit
+                deleteGame(id); 
+            } else {
+                openModal(id); // View
+            }
+        };
+        
+        // This is the functional delete call, separated from the confirmation logic
+        const deleteGame = (id) => {
+            const game = games.find(g => g.id === id);
+            if (!game) return;
+
+            // Removing explicit confirmation window (confirm()) as per environment instructions
+            games = games.filter(g => g.id !== id);
+            saveGames();
+            renderGrid();
+            renderFilterOptions();
+            showToast(`"${game.title}" removido permanentemente!`, 'warning');
         };
 
         window.openModal = (id) => {
@@ -952,6 +1421,7 @@
             const newIndex = (currentIndex + direction + games.length) % games.length;
             selectedGameId = games[newIndex].id;
             const content = document.getElementById('modal-content');
+            // Re-trigger CSS animation class by removing and adding it
             content.classList.remove('animate-zoom-in');
             void content.offsetWidth;
             content.classList.add('animate-zoom-in');
@@ -989,6 +1459,7 @@
                     game.platforms = [...game.platforms, platformName];
                 }
             });
+            renderFilterOptions();
         };
 
         window.changeLanguageOption = (option) => {
@@ -1016,9 +1487,9 @@
                     // Add if doesn't exist
                     currentMedia.push(type);
                 }
+                // Ensure the list is not empty, fallback if all removed (optional, depending on business rule)
+                if (currentMedia.length === 0) currentMedia = ["Físico"]; 
                 
-                // Optional: If empty, maybe default to nothing or handle validation? 
-                // We allow empty for now.
                 game.mediaType = currentMedia;
             });
         };
@@ -1037,31 +1508,6 @@
             });
         };
 
-        window.toggleSynopsis = () => {
-            const text = document.getElementById('synopsis-text');
-            const btnText = document.getElementById('read-more-text');
-            const btnIcon = document.querySelector('#read-more-btn svg');
-            
-            // Check if collapsed by checking the class presence
-            const isCollapsed = text.classList.contains('synopsis-clamp');
-
-            if (isCollapsed) {
-                // Expand
-                text.classList.remove('synopsis-clamp');
-                btnText.innerText = 'Ver menos';
-                if (btnIcon) {
-                    btnIcon.style.transform = 'rotate(180deg)';
-                }
-            } else {
-                // Collapse
-                text.classList.add('synopsis-clamp');
-                btnText.innerText = 'Ver mais';
-                if (btnIcon) {
-                    btnIcon.style.transform = 'rotate(0deg)';
-                }
-            }
-        };
-
         window.updateLoanName = (name) => {
             const gameIndex = games.findIndex(g => g.id === selectedGameId);
             if (gameIndex === -1) return;
@@ -1069,6 +1515,230 @@
             saveGames(); // Auto-save enabled
         };
 
+        // --- ADD / EDIT GAME LOGIC ---
+        
+        window.openAddGameModal = (editId = null) => {
+            const modal = document.getElementById('add-game-modal');
+            const titleEl = document.getElementById('modal-form-title');
+            const saveBtn = document.getElementById('modal-save-btn');
+            
+            modal.classList.remove('hidden');
+
+            if (editId) {
+                // Edit Mode
+                const game = games.find(g => g.id === editId);
+                if (!game) return;
+
+                document.getElementById('edit-game-id').value = editId;
+                titleEl.innerHTML = `<i data-lucide="pencil" class="w-6 h-6 text-amber-500"></i> Editar Jogo`;
+                saveBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Salvar Alterações`;
+                saveBtn.className = "px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg shadow-amber-900/20 transition-transform active:scale-95 flex items-center gap-2";
+
+                // Populate fields
+                document.getElementById('new-title').value = game.title;
+                document.getElementById('new-cover').value = game.cover;
+                updatePreview(game.cover);
+                document.getElementById('new-synopsis').value = game.synopsis;
+                document.getElementById('new-developer').value = game.developer;
+                document.getElementById('new-publisher').value = game.publisher;
+                document.getElementById('new-date').value = game.date;
+                document.getElementById('new-age').value = game.age;
+
+                newGamePlatforms = [...game.platforms];
+                newGameMediaType = Array.isArray(game.mediaType) ? [...game.mediaType] : [game.mediaType || "Físico"];
+                newGameLanguage = game.languageOption || "Sem Legenda";
+
+            } else {
+                // Add Mode
+                document.getElementById('edit-game-id').value = "";
+                titleEl.innerHTML = `<i data-lucide="plus-circle" class="w-6 h-6 text-blue-500"></i> Adicionar Novo Jogo`;
+                saveBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Salvar Jogo`;
+                saveBtn.className = "px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-900/20 transition-transform active:scale-95 flex items-center gap-2";
+
+                // Clear fields
+                document.getElementById('new-title').value = '';
+                document.getElementById('new-cover').value = '';
+                updatePreview('');
+                document.getElementById('new-synopsis').value = '';
+                document.getElementById('new-developer').value = '';
+                document.getElementById('new-publisher').value = '';
+                document.getElementById('new-date').value = '';
+                document.getElementById('new-age').selectedIndex = 0;
+                
+                newGamePlatforms = [];
+                newGameMediaType = [];
+                newGameLanguage = "Sem Legenda";
+            }
+            renderNewGameSelectors();
+            lucide.createIcons();
+        };
+
+        window.closeAddGameModal = () => {
+            document.getElementById('add-game-modal').classList.add('hidden');
+        };
+
+        window.updatePreview = (url) => {
+            const img = document.getElementById('new-game-preview');
+            const placeholder = document.getElementById('new-game-placeholder');
+            if(url) {
+                img.src = url;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        };
+
+        // Render selectors inside Add Modal
+        const renderNewGameSelectors = () => {
+            // 1. Platforms
+            const platformsContainer = document.getElementById('new-platforms-container');
+            platformsContainer.innerHTML = MASTER_PLATFORM_LIST.map(plat => {
+                const isSelected = newGamePlatforms.some(p => normalizePlatform(p) === normalizePlatform(plat));
+                return `
+                    <button onclick="toggleNewPlatform('${plat}')" class="flex items-center gap-2 p-2 rounded border text-left text-xs transition-colors ${isSelected ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}">
+                        <div class="w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-white border-white' : 'border-slate-500'}">
+                            ${isSelected ? '<i data-lucide="check" class="w-3 h-3 text-blue-600 stroke-[4]"></i>' : ''}
+                        </div>
+                        <span>${plat}</span>
+                    </button>
+                `;
+            }).join('');
+
+            // 2. Audio
+            const audioContainer = document.getElementById('new-audio-container');
+            const audioOpts = ["Dublado", "Legendado em Português", "Sem Legenda"];
+            audioContainer.innerHTML = audioOpts.map(opt => {
+                const isSelected = newGameLanguage === opt;
+                return `
+                    <button onclick="toggleNewAudio('${opt}')" class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${isSelected ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}">
+                        ${opt}
+                    </button>
+                `;
+            }).join('');
+
+            // 3. Media
+            const mediaContainer = document.getElementById('new-media-container');
+            const mediaOpts = ["Físico", "Digital"];
+            mediaContainer.innerHTML = mediaOpts.map(type => {
+                const isSelected = newGameMediaType.includes(type);
+                return `
+                    <button onclick="toggleNewMedia('${type}')" class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-2 ${isSelected ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'}">
+                        ${isSelected ? '<i data-lucide="check" class="w-3 h-3"></i>' : ''} ${type}
+                    </button>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        window.toggleNewPlatform = (plat) => {
+            const normPlat = normalizePlatform(plat);
+            if (newGamePlatforms.some(p => normalizePlatform(p) === normPlat)) {
+                newGamePlatforms = newGamePlatforms.filter(p => normalizePlatform(p) !== normPlat);
+            } else {
+                newGamePlatforms.push(plat);
+            }
+            renderNewGameSelectors();
+        };
+
+        window.toggleNewAudio = (opt) => {
+            newGameLanguage = opt;
+            renderNewGameSelectors();
+        };
+
+        window.toggleNewMedia = (type) => {
+            if (newGameMediaType.includes(type)) {
+                newGameMediaType = newGameMediaType.filter(t => t !== type);
+            } else {
+                newGameMediaType.push(type);
+            }
+            renderNewGameSelectors();
+        };
+
+        window.handleSaveGame = () => {
+            const titleInput = document.getElementById('new-title');
+            if (!titleInput.value) {
+                showToast("Por favor, insira o título do jogo.", 'error');
+                return;
+            }
+            
+            // Validation: Must select at least one platform and one media type
+            if (newGamePlatforms.length === 0) {
+                showToast("Selecione pelo menos uma plataforma.", 'error');
+                return;
+            }
+            if (newGameMediaType.length === 0) {
+                showToast("Selecione pelo menos um tipo de mídia (Físico ou Digital).", 'error');
+                return;
+            }
+
+            const title = titleInput.value.toUpperCase();
+
+            const editId = document.getElementById('edit-game-id').value;
+            
+            if (editId) {
+                // UPDATE EXISTING
+                const id = parseInt(editId);
+                const index = games.findIndex(g => g.id === id);
+                if (index !== -1) {
+                    games[index] = {
+                        ...games[index],
+                        title: title,
+                        cover: document.getElementById('new-cover').value || games[index].cover,
+                        synopsis: document.getElementById('new-synopsis').value || games[index].synopsis,
+                        developer: document.getElementById('new-developer').value || games[index].developer,
+                        publisher: document.getElementById('new-publisher').value || games[index].publisher,
+                        date: document.getElementById('new-date').value || games[index].date,
+                        age: document.getElementById('new-age').value,
+                        platforms: newGamePlatforms,
+                        languageOption: newGameLanguage,
+                        mediaType: newGameMediaType
+                    };
+                    showToast(`"${title}" atualizado com sucesso!`);
+                }
+            } else {
+                // CREATE NEW
+                const newId = games.length > 0 ? Math.max(...games.map(g => g.id)) + 1 : 1;
+                const newGame = {
+                    id: newId,
+                    title: title,
+                    cover: document.getElementById('new-cover').value || 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Playstation_logo_colour.svg',
+                    synopsis: document.getElementById('new-synopsis').value || "Sem sinopse.",
+                    developer: document.getElementById('new-developer').value || "Desconhecido",
+                    publisher: document.getElementById('new-publisher').value || "Desconhecido",
+                    date: document.getElementById('new-date').value || "----",
+                    age: document.getElementById('new-age').value,
+                    platforms: newGamePlatforms,
+                    languageOption: newGameLanguage,
+                    mediaType: newGameMediaType,
+                    loanStatus: 'available',
+                    loanedTo: '',
+                    isPlaying: false
+                };
+                games.push(newGame);
+                showToast(`"${title}" adicionado com sucesso!`);
+            }
+
+            // Sort
+            games.sort((a, b) => {
+                const genA = getGenerationScore(a.platforms);
+                const genB = getGenerationScore(b.platforms);
+                if (genA !== genB) return genA - genB;
+                return a.title.localeCompare(b.title);
+            });
+
+            saveGames();
+            renderGrid();
+            renderFilterOptions();
+            closeAddGameModal();
+            // Disable edit mode after save for better flow
+            if (isEditMode) toggleEditMode();
+        };
+
+        window.deleteGame = deleteGame; // Expose the delete function to global scope
+
+        // --- EXISTING RENDER MODAL CONTENT ---
         const renderModalContent = () => {
             const game = games.find(g => g.id === selectedGameId);
             if (!game) return;
@@ -1079,7 +1749,7 @@
 
             const platformSet = new Set(game.platforms.map(p => normalizePlatform(p)));
             const platformsHtml = MASTER_PLATFORM_LIST.map(plat => {
-                const isAvailable = platformSet.has(plat);
+                const isAvailable = platformSet.has(normalizePlatform(plat)); // Use normalized platform for check
                 return `
                     <button 
                         onclick="togglePlatform('${plat}')"
@@ -1121,8 +1791,11 @@
 
             // Media Type logic
             const mediaColorClass = getMediaColorClass(game.platforms);
+            // Ensure game.mediaType is treated as an array for display
+            const currentMediaArray = Array.isArray(game.mediaType) ? game.mediaType : [game.mediaType || "Físico"];
+
             const mediaOptions = ["Físico", "Digital"].map(type => {
-                const isSelected = Array.isArray(game.mediaType) ? game.mediaType.includes(type) : (game.mediaType === type);
+                const isSelected = currentMediaArray.includes(type);
                 return `
                     <button
                         onclick="changeMediaType('${type}')"
@@ -1186,11 +1859,11 @@
                     <div id="modal-scroll-body" class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-6">
                         <div class="prose prose-invert max-w-none">
                             <h3 class="text-blue-400 text-sm font-bold uppercase tracking-wider mb-2">Sinopse</h3>
-                            <!-- Removido 'synopsis-clamp' para mostrar todo o texto -->
+                            <!-- Mantido o texto completo da sinopse no modal -->
                             <p id="synopsis-text" class="text-slate-300 leading-relaxed text-lg transition-all duration-300">
                                 ${game.synopsis}
                             </p>
-                            <!-- Botão 'Ver mais' removido pois não é mais necessário -->
+                            <!-- Botão 'Ver mais' removido pois não é mais necessário no modal -->
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950/50 p-4 rounded-lg border border-slate-800">
                             <div>
@@ -1227,7 +1900,7 @@
                                         value="${game.loanedTo || ''}"
                                         placeholder="Nome da pessoa..." 
                                         oninput="updateLoanName(this.value)"
-                                        onkeydown="if(event.key === 'Enter') this.blur()"
+                                        onkeydown="if(event.key === 'Enter') closeModal()"
                                         class="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-slate-500"
                                     />
                                 </div>
@@ -1275,11 +1948,36 @@
             renderFilterOptions();
             renderGrid();
             lucide.createIcons();
+            
+            // Listener para fechar menu ao clicar fora
+            document.addEventListener('click', (e) => {
+                const headerButtons = document.getElementById('header-buttons');
+                const headerLogoTrigger = document.getElementById('header-logo-trigger'); 
+
+                if (!headerButtons.classList.contains('hidden')) {
+                    // Check if the click target is NOT the menu container AND NOT the trigger button
+                    if (!headerButtons.contains(e.target) && !headerLogoTrigger.contains(e.target)) {
+                        closeHeaderButtons();
+                    }
+                }
+            });
+
             document.addEventListener('keydown', (e) => {
+                // Global hotkeys
+                if (e.key === 'Escape') {
+                    if (document.getElementById('modal-backdrop').classList.contains('hidden') === false) {
+                        closeModal();
+                    } else if (document.getElementById('add-game-modal').classList.contains('hidden') === false) {
+                        closeAddGameModal();
+                    } else if (document.getElementById('header-buttons').classList.contains('hidden') === false) {
+                        closeHeaderButtons();
+                    }
+                }
+                
+                // Modal navigation hotkeys
                 if (selectedGameId !== null) {
                     if (e.key === 'ArrowRight') navigateGame(1);
                     if (e.key === 'ArrowLeft') navigateGame(-1);
-                    if (e.key === 'Escape') closeModal();
                 }
             });
         });
